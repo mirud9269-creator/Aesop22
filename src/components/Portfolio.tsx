@@ -1,0 +1,1049 @@
+import React, { useState, useRef } from 'react';
+import { cn } from '@/src/lib/utils';
+
+// 2. 페이지 2용 실제 네이버 블로그 연동 데이터 (제공해주신 16개 DB)
+const page2DataRaw = [
+  { title: "울산동구아파트리모델링, 인테리어 가격보다 중요한 것은 바로 '이것' 입니다.", link: "https://blog.naver.com/guseo109/223913869128", img: "https://postfiles.pstatic.net/MjAyNTA2MjdfMjU3/MDAxNzUxMDEwNjk5NjIy.Y-c67JFz406q-BTkGznMwjRmaLh2CSOw8LvcCYnD0EMg.WfC1vj-DqOhuOjyH2LDbI8xRaIV7efV1W5Cv0U3Mov8g.JPEG/001_%BC%F6%C1%A4.jpg?type=f238", tags: ["#울산동구", "#인테리어견적"] },
+  { title: "울산동구인테리어업체, 이솝에선 대송동 현대아파트 24평형 이렇게 변화시켰습니다!", link: "https://blog.naver.com/guseo109/223911225830", img: "https://postfiles.pstatic.net/MjAyNTA2MjdfMjAg/MDAxNzUxMDExMjAzMjc4.P365SkA8S3ZX-L-ACOUXAaZmKRdhjs37Eyl9EWV7tnkg.40wfsM6rfP-3QN07Ef1WXyiDli2SO7EhC8aHu_eJqZgg.PNG/%C0%CC%BC%D9%C0%CE%C5%D7%B8%AE%BE%EE-002.png?type=f238", tags: ["#대송동현대", "#24평형"] },
+  { title: "[이솝인테리어_울산본점] 울산 구축 빌라 올 리모델링 고객님의 라이프스타일 100% 반영한 유니크한 인테리어 후기", link: "https://blog.naver.com/guseo109/223874171650", img: "https://postfiles.pstatic.net/MjAyNTA1MjJfMjAy/MDAxNzQ3ODg5MzA2Njcz.cQcpxjUJEP-b2bQRt1IUyclGRmv2xHHtcAVb4PftN3sg.1gLtOr4C0xNriJP6SDGpZQXFDLK44sxXNqxsxh54K_Ig.PNG/%C0%CC%BC%D9%C0%CE%C5%D7%B8%AE%BE%EE_%BA%B9%BB%E7%BA%BB-_2_-001_%2819%29.png?type=f238", tags: ["#구축빌라", "#올리모델링"] },
+  { title: "[이솝인테리어 울산본점] 화이트톤으로 밝고 더 넓어진 울산 북구 동아청구 아파트 신축 스타일 리모델링", link: "https://blog.naver.com/guseo109/223874095768", img: "https://postfiles.pstatic.net/MjAyNTA1MjJfOTMg/MDAxNzQ3ODg2MDY1ODM5.wmMwXxHBedTMjiiD15eP0s8pnxzyR7U3EusrQ2g8_w8g.hGDHwoVIgaWCWOV-hJWJvCfIUNsnbUFPajU2myELcQkg.PNG/%3F%9D%B4%3F%86%9D%3F%9D%B8%3F%85%8C%EB%A6%AC%EC%96%B4_%EB%B3%B5%EC%82%AC%EB%B3%3F-_2_-001_%2818%29.png?type=f238", tags: ["#북구동아청구", "#화이트톤"] },
+  { title: "[이솝인테리어 울산본점] 울산 남구 달동 어울림아파트 화이트 톤으로 미니멀 & 실용성 모두 잡은 인테리어 리모델링 후기", link: "https://blog.naver.com/guseo109/223843802354", img: "https://postfiles.pstatic.net/MjAyNTA0MjNfMjI4/MDAxNzQ1Mzg1NDQ3MTcx.f5ArXl6Ry_KYLfcWWVti1Qs4gwl8rS11tNAQpcUHsu8g.Pc5rvcD1RuXbKNZ4XSYYfkFSOuN-v6l4KRrLq-6_B3sg.PNG/%C0%CC%BC%D9%C0%CE%C5%D7%B8%AE%BE%EE_%BA%B9%BB%E7%BA%BB-_2_-001_%2817%29.png?type=f238", tags: ["#달동어울림", "#미니멀인테리어"] },
+  { title: "[이솝인테리어 울산본점] 울산 효성해링턴플레이스 주방, 거실, 욕실 부분 리모델링으로 실용성 UP!", link: "https://blog.naver.com/guseo109/223817404601", img: "https://postfiles.pstatic.net/MjAyNTA0MDFfNjUg/MDAxNzQzNDgzMDcxMzMy.DgygKCdKOvkX3PcCrA5pv2FRG6OgIu-lVWyBlAeBl5sg.ywPOTtPaBwyQnws5zR9kVhXGXBDKEcV79sB5ySKr-Vkg.PNG/%C0%CC%BC%D9%C0%CE%C5%D7%B8%AE%BE%EE_%BA%B9%BB%E7%BA%BB-_2_-001_%2816%29.png?type=f238", tags: ["#효성해링턴", "#부분리모델링"] },
+  { title: "[이솝인테리어 울산본점] 약사 아이파크 아파트 인테리어 후기 유럽미장 느낌의 필름과 로즈마블 장판으로 모던한 리모델링", link: "https://blog.naver.com/guseo109/223817357773", img: "https://postfiles.pstatic.net/MjAyNTA0MDFfMTcw/MDAxNzQzNDc3NTcyNDAz.GmvTaVX1Qis3Idua6Uz_s5M4r-5Pzyezye7cNa_16jQg.Bf02sKZXxBe5ECQutzeOx2WY5c4-6_KepihqQCX6NHgg.PNG/%3F%9D%B4%3F%86%9D%3F%9D%B8%3F%85%8C%EB%A6%AC%EC%96%B4_%EB%B3%B5%EC%82%AC%EB%B3%3F-_2_-001_%2815%29.png?type=f238", tags: ["#약사아이파크", "#유럽미장"] },
+  { title: "[이솝인테리어 울산본점] 울산 북구 달천 그린카운티아파트 르그랑 스위치 우드와 화이트톤의 조화로운 인테리어 후기", link: "https://blog.naver.com/guseo109/223786069015", img: "https://postfiles.pstatic.net/MjAyNTAzMDZfNjYg/MDAxNzQxMjQ0NDE4OTc3.scLKJsYAClC3o1LrZOFeiRlw4FpHkQWbXnvEv6_1iGAg.g0PQDzq_2Y3Cl4fQLLe-decb7hNTXaZX0I77rBY40D8g.PNG/%3F%9D%B4%3F%86%9D%3F%9D%B8%3F%85%8C%EB%A6%AC%EC%96%B4_%EB%B3%B5%EC%82%AC%EB%B3%3F-_2_-001_%2812%29.png?type=f238", tags: ["#달천그린카운티", "#우드톤"] },
+  { title: "[이솝인테리어 울산본점] 울산 구축 빌라 심플 모던 신혼부부 스타일링 인테리어 후기", link: "https://blog.naver.com/guseo109/223763450031", img: "https://postfiles.pstatic.net/MjAyNTAyMTdfMjA2/MDAxNzM5NzYyNjMzODI0.opKEI3lHJFh23sHtvvUZVJ2GArviV1X7Du-DKQseFnUg.flfGD3YdgxOm374q55vfjruWA7CkMC72BCKaLf1pIU0g.PNG/%3F%9D%B4%3F%86%9D%3F%9D%B8%3F%85%8C%EB%A6%AC%EC%96%B4_%EB%B3%B5%EC%82%AC%EB%B3%3F-_2_-001_%2811%29.png?type=f238", tags: ["#신혼부부인테리어", "#심플모던"] },
+  { title: "[울산인테리어] 부분 리모델링으로 완벽하게 모던한 스타일로 변신한 울산 중구 약사더샵 인테리어 후기!", link: "https://blog.naver.com/guseo109/223754995149", img: "https://postfiles.pstatic.net/MjAyNTAyMTBfMjIg/MDAxNzM5MTQ4NzE1MDcy.UJ_oG4M8ExCDc-lwCcm5GkfAGLgtLejw1-GbHYIOq40g.zvfLpAkirtRLHhYAs4AqjOGO2GKfz928YmY__kT4uZwg.PNG/%3F%9D%B4%3F%86%9D%3F%9D%B8%3F%85%8C%EB%A6%AC%EC%96%B4_%EB%B3%B5%EC%82%AC%EB%B3%3F-_2_-001_%284%29.png?type=f238", tags: ["#약사더샵", "#모던스타일"] },
+  { title: "[울산인테리어] 중구 성안동 성안네오빌 6차 충격 건식난방! 바닥공사부터 리모델링까지 ! 확 바뀐 성안네오빌 인테리어", link: "https://blog.naver.com/guseo109/223727565672", img: "https://postfiles.pstatic.net/MjAyNTAxMTZfNzcg/MDAxNzM2OTk0MTQ4MTAz.kx46isAp0ersjyaXK7hBPO0xN7u_3KPY2dJ6yKy76HQg.8x0R-4Fr8BCS59xcigpsCAssUBTmerYiPj3TQpWarIYg.PNG/%3F%9D%B4%3F%86%9D%3F%9D%B8%3F%85%8C%EB%A6%AC%EC%96%B4_%EB%B3%B5%EC%82%AC%EB%B3%3F-_2_-001_%282%29.png?type=f238", tags: ["#성안네오빌", "#건식난방"] },
+  { title: "[울산인테리어] 울산 중구 태화동 일신아파트 동배관 교체와 화이트 & 우드톤으로 변신한 리모델링 후기", link: "https://blog.naver.com/guseo109/223717448246", img: "https://postfiles.pstatic.net/MjAyNTAxMDdfMTU1/MDAxNzM2MjI0MjU1MzEy.6LpxwVwW8LUpcH5uNlEWizD-SQmpJAaBQuEH_VzrwtYg.RkkMUS6bQs0hMT86MeQARNFJ-MSuSlLIrPFo9iUL92gg.PNG/%C0%CC%BC%D9%C0%CE%C5%D7%B8%AE%BE%EE_%BA%B9%BB%E7%BA%BB-_2_-001_%281%29.png?type=f238", tags: ["#태화동일신", "#배관교체"] },
+  { title: "[울산인테리어] 울산 북구 화봉동 동아청구아파트 31평 180도 달라진 심플 모던 올리모델링 후기", link: "https://blog.naver.com/guseo109/223714481629", img: "https://postfiles.pstatic.net/MjAyNTAxMDRfMTE2/MDAxNzM1OTU5NzExMzM3.zOWmTlkYCdUjlEFZzktJtGxoruvmFNX8DQDjJ35ZoL0g.L7ay5h1qATxbv5kM-ztSA3JqBMgF3uKztvTZ-c-T1R4g.PNG/%3F%9D%B4%3F%86%9D%3F%9D%B8%3F%85%8C%EB%A6%AC%EC%96%B4_%EB%B3%B5%EC%82%AC%EB%B3%3F-_2_-001.png?type=f238", tags: ["#화봉동동아청구", "#31평형"] },
+  { title: "[울산인테리어] 울산 북구 매곡현대파크맨션 깔끔하고 모던한 화이트톤 리모델링 인테리어 후기", link: "https://blog.naver.com/guseo109/223684475069", img: "https://postfiles.pstatic.net/MjAyNDEyMDZfMjA4/MDAxNzMzNDQ5ODM5NTMy.zsg2mUaM1Hwm-HBwviW4QThe1OD-ku6-AvULk1hPvx4g.ZEriXTdmyO3Ytj_0MNZt6B5AR0NbP3Il8QUN7rTh-tYg.PNG/%3F%9D%B4%3F%86%9D%3F%9D%B8%3F%85%8C%EB%A6%AC%EC%96%B4_%EB%B3%B5%EC%82%AC%EB%B3%3F-_2_-001_%2814%29.png?type=f238", tags: ["#매곡현대파크", "#화이트인테리어"] },
+  { title: "[울산인테리어] 울산 동구 화정동 힐스테이트이스턴베이 28평 블랙모던 인테리어 리모델링 후기", link: "https://blog.naver.com/guseo109/223660629474", img: "https://postfiles.pstatic.net/MjAyNDExMTRfMjkz/MDAxNzMxNTcwNjA4MzUz.5L4bLe-CIcJM1SCnjawjXtYRga6-C1ShqOyYnolNg2Eg.21NOTM8-ngvv25f1jfU876zlgoQPBOWQBtlAbuorUUkg.PNG/%C0%CC%BC%D9%C0%CE%C5%D7%B8%AE%BE%EE_%BA%B9%BB%E7%BA%BB-_2_-001_%2813%29.png?type=f238", tags: ["#힐스테이트이스턴베이", "#블랙모던"] },
+  { title: "[울산인테리어] 울산 신천 극동스타클래스 34평 우드 내추럴한 우드와 화이트톤 인테리어 리모델링 대변신 후기", link: "https://blog.naver.com/guseo109/223641427175", img: "https://postfiles.pstatic.net/MjAyNDEwMzFfMjM4/MDAxNzMwMzU5NDE0NDA1.ZYbtroVMk-sUT5AYzhdppGoQ4C2Hm4C8gzTDa7q18Kgg.Vqrx0hGyr8WC090fYNUIE79Yq6REoCE5NIPKdATpPDIg.PNG/%3F%9D%B4%3F%86%9D%3F%9D%B8%3F%85%8C%EB%A6%AC%EC%96%B4_%EB%B3%B5%EC%82%AC%EB%B3%3F-_2_-001_%2812%29.png?type=f238", tags: ["#신천극동스타클래스", "#34평형"] }
+];
+
+// 1. 페이지 1용 실제 네이버 블로그 연동 데이터 (제공해주신 16개 DB)
+const page1DataRaw = [
+  { title: "중산동 일동미라주 25평형 - 300회의 노하우가 집약된 완벽한 공간 변신", tags: ["#중산동일동미라주", "#공간혁신"], img: "https://postfiles.pstatic.net/MjAyNjAzMjVfOTUg/MDAxNzc0NDI0MDE2Mjcw.GRINrRtir9LX07UY5-48MghKHbEapFrfDZ-aiK7hOzIg.qYMo-PepPRU_1ZkGcaG1l8oEU4odJc9I7xdbhIldr7Mg.PNG/%C0%CC%BC%D9%C0%CE%C5%D7%B8%AE%BE%EE-032.png?type=f238", link: "https://blog.naver.com/PostView.naver?blogId=guseo109&logNo=224229245366&categoryNo=8&parentCategoryNo=&from=thumbnailList" },
+  { title: "매곡동 월드메르디앙 - 하이엔드 마감 퀄리티로 완성한 프리미엄 주거 공간", tags: ["#매곡동월드메르디앙", "#하이엔드시공"], img: "https://postfiles.pstatic.net/MjAyNjAxMDhfMTg1/MDAxNzY3ODU3NDc2MTgz.da_Vddra-qFjmBhskikS_oevh1PYtnGQJ9XYMQSF-OYg.G8C2LFxTFW9PgG6-IFnRI58ClvypZS4SU3ozitMjLJUg.PNG/%BD%E6%B3%D7%C0%CF.png?type=f238", link: "https://blog.naver.com/PostView.naver?blogId=guseo109&logNo=224139358146&categoryNo=8&parentCategoryNo=&from=thumbnailList" },
+  { title: "동부현대패밀리아파트 - 일상의 피로를 씻어내는 진정한 힐링 스페이스", tags: ["#동부현대패밀리", "#휴식공간"], img: "https://postfiles.pstatic.net/MjAyNTEyMzBfMjI3/MDAxNzY3MDg5OTUwODAw.f1fr12RZ57tUcItTPFCDps0acREfx3H9uBZ_Ft-R-10g.RiWvuoEAH5HPAoOQwK8gPIaTD6Jyn2IIyJxcD_UfS4gg.PNG/%C0%CC%BC%D9%C0%CE%C5%D7%B8%AE%BE%EE-030.png?type=f238", link: "https://blog.naver.com/PostView.naver?blogId=guseo109&logNo=224128205634&categoryNo=8&parentCategoryNo=&from=thumbnailList" },
+  { title: "힐스테이트 이스턴베이 34평 - 동선의 미학, 공간의 의도를 새롭게 설계하다", tags: ["#이스턴베이", "#동선최적화"], img: "https://postfiles.pstatic.net/MjAyNTEyMTFfNTgg/MDAxNzY1NDQ4MDAxMjQx.P87xLCY2FMEU0zMBDIHtzL9k34Gv7c-QCWHIMwPFjjkg.CQURjE4usvKd7jg4_QkcpelEiGNoZg7mT9XaqvRtRcIg.PNG/%C0%CC%BC%D9%C0%CE%C5%D7%B8%AE%BE%EE-029.png?type=f238", link: "https://blog.naver.com/PostView.naver?blogId=guseo109&logNo=224106373929&categoryNo=8&parentCategoryNo=&from=thumbnailList" },
+  { title: "울산 북구 아파트 인테리어 - 20평대를 30평대처럼, 시각적 확장의 마법", tags: ["#공간확장", "#소형평수리모델링"], img: "https://postfiles.pstatic.net/MjAyNTExMjdfMzEg/MDAxNzY0MjMzOTg4MTQ0.5pws7oZeVnkPtklymLW7H2homwxtLbNDcTIxD674d8gg.bjY6GTZYS2npcVgpSWkKxV258n43QX8o7Xhf6InlJ0Yg.PNG/%BD%E6%B3%D7%C0%CF.png?type=f238", link: "https://blog.naver.com/PostView.naver?blogId=guseo109&logNo=224090281130&categoryNo=8&parentCategoryNo=&from=thumbnailList" },
+  { title: "성안금호타운 리모델링 - 기본기부터 탄탄하게, 결함 제로의 무결점 하우스", tags: ["#성안금호타운", "#무결점시공"], img: "https://postfiles.pstatic.net/MjAyNTExMjBfMjQg/MDAxNzYzNjI1NTAyMDU2.B_Df4v6-x47LMowJqQwH3ZyNaIW90gI3aL5V_cO7CQQg.SKq92KE1MV2VdGcm5twEaZRJa3kgledVI-WWfDOgt1Ug.PNG/%BD%E6%B3%D7%C0%CF.png?type=f238", link: "https://blog.naver.com/PostView.naver?blogId=guseo109&logNo=224082462847&categoryNo=8&parentCategoryNo=&from=thumbnailList" },
+  { title: "염포성원상떼빌 - 낡은 원목의 완벽한 탈바꿈, 화이트 톤 모던 디자인", tags: ["#성원상떼빌", "#화이트인테리어"], img: "https://postfiles.pstatic.net/MjAyNTExMTNfMjM5/MDAxNzYzMDAyNjMzODQ1.J8-myjgUs-9ZnBjpX-SQim9lx7HCkBsJ84Rsa1YOPKgg.hYi9535efMm1gw98BOccQ3ZdPwbblTtKNugBNmOcfRYg.PNG/%BD%E6%B3%D7%C0%CF.png?type=f238", link: "https://blog.naver.com/PostView.naver?blogId=guseo109&logNo=224074552100&categoryNo=8&parentCategoryNo=&from=thumbnailList" },
+  { title: "울산 북구 인테리어 - 화이트와 우드가 빚어내는 타임리스 모던 감성", tags: ["#우드앤화이트", "#타임리스디자인"], img: "https://postfiles.pstatic.net/MjAyNTExMDZfMjI0/MDAxNzYyNDA2NDk3MTIy.6EgyYNFCOvmh65v9tlKYz__IFPT0pbKFpNCXQ-DPxV0g.MLLJ2vcICs3b9E4B6WpsVx2g_FbljUpO6dT_OQdT04Ig.PNG/%BD%E6%B3%D7%C0%CF.png?type=f238", link: "https://blog.naver.com/PostView.naver?blogId=guseo109&logNo=224066815942&categoryNo=8&parentCategoryNo=&from=thumbnailList" },
+  { title: "달동 아파트 리모델링 - 덜어냄의 미학, 절제된 미니멀리즘 시공 현장", tags: ["#달동인테리어", "#미니멀리즘"], img: "https://postfiles.pstatic.net/MjAyNTEwMjhfMjAw/MDAxNzYxNjE1MTg4MjY2.rkgS41WQavYF8WkXum77hw5ltSUFw9Px8SzMpaQNrTUg.GJ8HQdyJ9fFNdcHw_IsyUefNdsINlop9zN3zZ092CDsg.PNG/%BD%E6%B3%D7%C0%CF.png?type=f238", link: "https://blog.naver.com/PostView.naver?blogId=guseo109&logNo=224056290874&categoryNo=8&parentCategoryNo=&from=thumbnailList" },
+  { title: "전하대경넥스빌 - 화이트 앤 우드 밸런스, 신축을 뛰어넘는 퀄리티", tags: ["#전하대경넥스빌", "#신축급리모델링"], img: "https://postfiles.pstatic.net/MjAyNTEwMjFfNzQg/MDAxNzYxMDExNTI3OTc1.ZwGaxZl27xUc47S28k_xj7rF0IU-vIIcol1qq1IF2Icg._iifRW6khB4jHXk_8gyQyUtZ0PeQLBunzAJ5mn06AAkg.PNG/%BD%E6%B3%D7%C0%CF.png?type=f238", link: "https://blog.naver.com/PostView.naver?blogId=guseo109&logNo=224048446237&categoryNo=8&parentCategoryNo=&from=thumbnailList" },
+  { title: "오토밸리로 줌파크 - 공간의 한계를 넘다, 화이트 톤 확장 인테리어", tags: ["#줌파크", "#공간확장"], img: "https://postfiles.pstatic.net/MjAyNTA5MzBfMjkx/MDAxNzU5MjAwMTQ0MDk3.IULjwJuC5_NFzdonIE57bHZTwgCVUpTjsJvnqSkAy7cg.uPPgvegkFkbw88bAVz_JGPjkpKjaNLTOuN4XRsHX6RUg.PNG/%BD%E6%B3%D7%C0%CF.png?type=f238", link: "https://blog.naver.com/PostView.naver?blogId=guseo109&logNo=224026898721&categoryNo=8&parentCategoryNo=&from=thumbnailList" },
+  { title: "송정푸르지오 - 이솝만의 시그니처, 따뜻한 온기가 머무는 맞춤형 디자인", tags: ["#송정푸르지오", "#시그니처디자인"], img: "https://postfiles.pstatic.net/MjAyNTA5MThfMTc4/MDAxNzU4MTc5NzAyNzQ5.lQJJdGn-oj7g20e9nS350ctpApGeG_F5KaDXTwwAjk0g.WHXkD8Ttki_B-onnciTbDucM7Qy61bViJzUax9SySYkg.PNG/%BD%E6%B3%D7%C0%CF.png?type=f238", link: "https://blog.naver.com/PostView.naver?blogId=guseo109&logNo=224013101919&categoryNo=8&parentCategoryNo=&from=thumbnailList" },
+  { title: "전하대경넥스빌 리모델링 - 공간의 가치를 극대화하는 전략적 인테리어", tags: ["#전략적인테리어", "#가치상승"], img: "https://postfiles.pstatic.net/MjAyNTA5MDlfMzcg/MDAxNzU3Mzg5MjUzNzI2.WnkdR9lN3d_GbzbnZmvpi3MM5hAxHQCU6kQdL4Vdt5Ag.y_9c63frGq8j-MUGyDwXqt8qRcpGfJVKJDQTQO9iUbIg.PNG/%BD%E6%B3%D7%C0%CF.png?type=f238", link: "https://blog.naver.com/PostView.naver?blogId=guseo109&logNo=224001250065&categoryNo=8&parentCategoryNo=&from=thumbnailList" },
+  { title: "달동 구축 아파트의 재탄생 - 1999년의 흔적을 지운 완벽한 트렌드 시공", tags: ["#구축리모델링", "#트렌드시공"], img: "https://postfiles.pstatic.net/MjAyNTA4MThfMjk0/MDAxNzU1NTA2NTU3Mzcz.Y8xihY9j6njGZAOVk2i2KqRCIXnuoLNTjWiVSEbc5AEg.fqxUhwUtWwefD1kumHeoeUGqfy987Azb7imth7ClXFsg.PNG/%C0%CC%BC%D9%C0%CE%C5%D7%B8%AE%BE%EE-006.png?type=f238", link: "https://blog.naver.com/PostView.naver?blogId=guseo109&logNo=223975412484&categoryNo=8&parentCategoryNo=&from=thumbnailList" },
+  { title: "송정호반베르디움 욕실 시공 - 300번의 데이터가 증명하는 욕실 인테리어의 정석", tags: ["#송정호반베르디움", "#욕실인테리어"], img: "https://postfiles.pstatic.net/MjAyNTA4MDdfMTA3/MDAxNzU0NTU0Mjk1NDgx.gcx81e3b40qUQfkPdbI0cPlDSHLdmXiP3ZcKQkHAcrUg.GWF9jTIpv9YgzueM_Okrsx6eOpMu-Im6rqCfex1ChrIg.PNG/%C0%CC%BC%D9%C0%CE%C5%D7%B8%AE%BE%EE-006.png?type=f238", link: "https://blog.naver.com/PostView.naver?blogId=guseo109&logNo=223962596810&categoryNo=8&parentCategoryNo=&from=thumbnailList" },
+  { title: "복층 아파트 인테리어 - 압도적 스케일, 300건의 누적 데이터로 완성한 시공 노하우", tags: ["#복층인테리어", "#프리미엄시공"], img: "https://postfiles.pstatic.net/MjAyNTA3MDJfNDAg/MDAxNzUxNDQ5MzIwNjM4.2Fsmm1Ipl5ZLlmecdzLeehFLPn7juzn0adEelwd8vpEg.hMzo-lAQnwxuQJU5L5slJZBp2Krggw3iJSQK_iqcd-kg.PNG/%C0%CC%BC%D9%C0%CE%C5%D7%B8%AE%BE%EE-003.png?type=f238", link: "https://blog.naver.com/PostView.naver?blogId=guseo109&logNo=223919528253&categoryNo=8&parentCategoryNo=&from=thumbnailList" }
+];
+
+const page3DataRaw = [
+  { title: "울산인테리어 중구 반구동 도원빌라 구축 빌라인테리어 울산 빌라 리모델링 후기", link: "https://blog.naver.com/guseo109/223630088751", img: "https://postfiles.pstatic.net/MjAyNDEwMjNfNDAg/MDAxNzI5NjQ3MzQ4NDM5.C2qCVWi-nefiXD1wFvF7vfgw7XMcNomBSqoMeI_wy18g.88T65BKr-LxAeyQqnm_2ZVd1wQG2GYaZwZBqCxoVeLYg.PNG/%C0%CC%BC%D9%C0%CE%C5%D7%B8%AE%BE%EE_%BA%B9%BB%E7%BA%BB-_2_-001_%2811%29.png?type=f238", tags: ["#반구동도원빌라", "#구축빌라"] },
+  { title: "울산인테리어 [33평] 북구 송정동 송정한양수자인 실링팬 매립형수전 깨끗한 마감으로 미니멀하고 깔끔한 인테리어 후기", link: "https://blog.naver.com/guseo109/223591155401", img: "https://postfiles.pstatic.net/MjAyNDA5MjBfMjM0/MDAxNzI2Nzk3MjM1MTI0.gOx-Tb-18Au2A52ZOmvnrfBvop46ZwmolPo5-chYAXAg.QO1_xH_iV0T_WN7bjxwzLz2YIQcBaVHxwOz3cexy3zUg.PNG/%3F%9D%B4%3F%86%9D%3F%9D%B8%3F%85%8C%EB%A6%AC%EC%96%B4_%EB%B3%B5%EC%82%AC%EB%B3%3F-_2_-001_%288%29.png?type=f238", tags: ["#송정한양수자인", "#33평형"] },
+  { title: "울산인테리어 [34평] 울산 남구 신정동 울산대공원 한신더휴 넓은 거실 가벽 분리 방만들기 시공 내추럴한 디자인 인테리어 리모델링 후기", link: "https://blog.naver.com/guseo109/223589696153", img: "https://postfiles.pstatic.net/MjAyNDA5MTJfMjY3/MDAxNzI2MTA5MzYzNjQz.o847905peJKEA5tjHH_Ige5v5A-BDBFS5Cpryg4ZnA0g.JuLp24HdaUNhsNkYcWbhDy-HnSsMG_zJoQdI-zyeVDwg.PNG/%3F%9D%B4%3F%86%9D%3F%9D%B8%3F%85%8C%EB%A6%AC%EC%96%B4_%EB%B3%B5%EC%82%AC%EB%B3%3F-_2_-001_%287%29.png?type=f238", tags: ["#울산대공원한신더휴", "#가벽시공"] },
+  { title: "울산인테리어 [40평] 울산 동구 화정동 힐스테이트이스턴베이 아늑하고 깔끔한 모던 인테리어 리모델링 후기", link: "https://blog.naver.com/guseo109/223581426545", img: "https://postfiles.pstatic.net/MjAyNDA5MTJfMTEy/MDAxNzI2MTAyNzY0OTMw.VRwIADNN4BButA5Qo9SVNjCy6dDbSAnw2oDKgAQWN_Ig.Rg1_D8j2FORkR_8lVyFGchoBeTgZX6bSUgPYdNoxJmwg.PNG/%3F%9D%B4%3F%86%9D%3F%9D%B8%3F%85%8C%EB%A6%AC%EC%96%B4_%EB%B3%B5%EC%82%AC%EB%B3%3F-_2_-001_%285%29.png?type=f238", tags: ["#힐스테이트이스턴베이", "#40평형"] },
+  { title: "울산인테리어 [45평] 울산 동구 동부동 상가주택 은은한 무드감 슬림라인조명 실리팬 인테리어 리모델링 후기 feat. 건축물 표제변경", link: "https://blog.naver.com/guseo109/223576564052", img: "https://postfiles.pstatic.net/MjAyNDA5MDZfOTUg/MDAxNzI1NjM0NTcwNDQz.XElnvCHXH552ceexpZSwdiZZP-0psF9oGFmyLTfkEfcg.GH0eXzio2yhkhaB0efMP5l1ahIs9DntLANoAkVqxyU8g.PNG/%C0%CC%BC%D9%C0%CE%C5%D7%B8%AE%BE%EE_%BA%B9%BB%E7%BA%BB-_3_-001_%284%29.png?type=f238", tags: ["#상가주택", "#45평형"] },
+  { title: "울산인테리어 [24평] 울산 남구 야음동 신정현대홈타운 1단지 화이트 모던 심플 구축아파트 인테리어 리모델링 후기", link: "https://blog.naver.com/guseo109/223573573522", img: "https://postfiles.pstatic.net/MjAyNDA5MDVfNTcg/MDAxNzI1NTA2MTEwNTc1.hZeCurpZjzp19E-jq--7J5LWDiLf_yPi2ruMcUDfH4cg.8ZBtM0rPgxkZLSY5ZpmcWVmEN4mNz5FU54g9a76r-QIg.PNG/%C0%CC%BC%D9%C0%CE%C5%D7%B8%AE%BE%EE_%BA%B9%BB%E7%BA%BB-_3_-001_%283%29.png?type=f238", tags: ["#신정현대홈타운", "#구축아파트"] },
+  { title: "[28평] 울산인테리어 울산 중구 성안동 금호어울림 아파트 올리모델링 블랙 앤 화이트 모던의 정석", link: "https://blog.naver.com/guseo109/223551171366", img: "https://postfiles.pstatic.net/MjAyNDA4MTdfMTE1/MDAxNzIzODg2OTg4MDYz.V1AXu_8WzbGi6Zg4kZ6hc4QwxBPusTDN154kvT2Tdugg.AEy4H5hpy2I76Z-kSYsE2n5sSJrRUbUbsh2vF8_9Kqog.PNG/%3F%9D%B4%3F%86%9D%3F%9D%B8%3F%85%8C%EB%A6%AC%EC%96%B4_%EB%B3%B5%EC%82%AC%EB%B3%3F-_2_-001_%281%29.png?type=f238", tags: ["#성안금호어울림", "#블랙앤화이트"] },
+  { title: "[23평] 울산 인테리어 울산 동구 전하동 현대패밀리전하 아파트 미니멀하고 넓어보이는 20평대 구축아파트 리모델링 후기", link: "https://blog.naver.com/guseo109/223534053380", img: "https://postfiles.pstatic.net/MjAyNDA4MDJfMTMw/MDAxNzIyNTY5NTMzNjI1.1Jds1ZI9d7V8I6wIa_8alMrgAkwHwK9odieQE2qJqKMg.K-KvMKTcf7lWnEk3JEG3nCV2jBbGZ7X694sp-cCrLsIg.PNG/%3F%9D%B4%3F%86%9D%3F%9D%B8%3F%85%8C%EB%A6%AC%EC%96%B4_%EB%B3%B5%EC%82%AC%EB%B3%3F-_1_-001_%286%29.png?type=f238", tags: ["#현대패밀리전하", "#23평형"] },
+  { title: "[31평] 울산 인테리어 울산 중구 태화동 진영동부아파트 실용성과 수납공간을 살린 31평 아파트 리모델링 인테리어 후기", link: "https://blog.naver.com/guseo109/223538401887", img: "https://postfiles.pstatic.net/MjAyNDA4MDZfNjcg/MDAxNzIyOTE2ODA4ODMx.Yco8DF-QKmDrL9Ew6OBeWPwO_NWfZNOoDzbfQHdHOsMg.qAgu0jMcKaMKDiaSYdNSnTLoi_0kEGXllwTGuLiey2Qg.PNG/%3F%9D%B4%3F%86%9D%3F%9D%B8%3F%85%8C%EB%A6%AC%EC%96%B4_%EB%B3%B5%EC%82%AC%EB%B3%3F-_2_-001.png?type=f238", tags: ["#태화동진영동부", "#수납공간"] },
+  { title: "[33평] 울산 북구 화봉동 화봉휴먼시아3단지 인테리어 산뜻하고 온화한 감성적인 공간 리모델링 후기", link: "https://blog.naver.com/guseo109/223533990737", img: "https://postfiles.pstatic.net/MjAyNDA4MDJfNzQg/MDAxNzIyNTYzNzc5NzQ1.CP4_dlod8D_bD2AO5X3UWL6GDuyCgUa9MBSRoYxYsAMg.mu7MHIOvRuPCH07O3RcJY2LoXrmWPziy695iItsSMksg.PNG/%3F%9D%B4%3F%86%9D%3F%9D%B8%3F%85%8C%EB%A6%AC%EC%96%B4_%EB%B3%B5%EC%82%AC%EB%B3%3F-_1_-001_%285%29.png?type=f238", tags: ["#화봉휴먼시아", "#감성공간"] },
+  { title: "[35평] 울산 인테리어 울산 남구 신정동 신성미소지움 인테리어 깔끔하고 단정한 화이트톤 부분 인테리어 후기", link: "https://blog.naver.com/guseo109/223533875179", img: "https://postfiles.pstatic.net/MjAyNDA4MDFfMjAg/MDAxNzIyNTE2NDg4ODgw.D1qg9YhzMAif23YnmOrkPUFOXxEtWh-615Enw0svZ1Qg.JArgmxD_kNEyZkcdhX6eajI1eraQklsiSimCSBddgFwg.PNG/%C0%CC%BC%D9%C0%CE%C5%D7%B8%AE%BE%EE_%BA%B9%BB%E7%BA%BB-_1_-001_%284%29.png?type=f238", tags: ["#신성미소지움", "#부분인테리어"] },
+  { title: "[32평] 울산 인테리어 울산 옥동 서강파크 부분리모델링 구축아파트 리모델링 블랙 &화이트로 심플하고 모던한 인테리어", link: "https://blog.naver.com/guseo109/223533343796", img: "https://postfiles.pstatic.net/MjAyNDA4MDFfMjk2/MDAxNzIyNDg5Mjc5Mjc4.UFPhNLINYhtKsfpDVkTlWyw4bzcP_Jxqer-BxiMA7NIg.NojePGo0LLHhx6-BsAYuvsX3VmvU7S1aV_YjOBKidNEg.PNG/%3F%9D%B4%3F%86%9D%3F%9D%B8%3F%85%8C%EB%A6%AC%EC%96%B4_%EB%B3%B5%EC%82%AC%EB%B3%3F-_1_-001_%283%29.png?type=f238", tags: ["#옥동서강파크", "#심플모던"] },
+  { title: "[31평] 울산인테리어 울산 북구 염포동 성원상떼빌 리모델링 깔끔한 화이트 모던 인테리어 후기", link: "https://blog.naver.com/guseo109/223532921499", img: "https://postfiles.pstatic.net/MjAyNDA4MDFfMjM2/MDAxNzIyNDg0NjQ4NDM1.6Ae7Xmj3h8Cu2fO_NVDUYBdlPbkUxheTt4w_SLZBDpAg.V1HpQSqdaUeQewyJMGnrpRQJWGjNuY3-YkN6erKp_X4g.PNG/%C0%CC%BC%D9%C0%CE%C5%D7%B8%AE%BE%EE_%BA%B9%BB%E7%BA%BB-_1_-001_%282%29.png?type=f238", tags: ["#염포성원상떼빌", "#화이트모던"] },
+  { title: "[20평] 울산인테리어 울산 동구 동부동 동부현대패밀리아파트 리모델링_환하고 더욱 깔끔해진 20평 구축 아파트 리모델링", link: "https://blog.naver.com/guseo109/223532826434", img: "https://postfiles.pstatic.net/MjAyNDA4MDFfMjUg/MDAxNzIyNDgwMDUxNzAz.J8iONOsJMW3EjZLxBMaBRIe-QzxRi8eZTzOTDXTjgEgg.-_S3BgB9NNgqkdTC7HvOZe51HRP0ylYzQG1nh729rKog.PNG/%3F%9D%B4%3F%86%9D%3F%9D%B8%3F%85%8C%EB%A6%AC%EC%96%B4_%EB%B3%B5%EC%82%AC%EB%B3%3F-_1_-001_%281%29.png?type=f238", tags: ["#동부현대패밀리", "#20평형"] },
+  { title: "태화동 일신아파트 23평형 - 화이트와 우드 톤으로 완성한 세련된 하이엔드 구축 리모델링", link: "https://blog.naver.com/guseo109/223525721315", img: "https://postfiles.pstatic.net/MjAyNDA3MjVfMTI3/MDAxNzIxOTEzNTQ2NjU5.dj7kVPLkoj7-JM90tchDTNr0fLPIFJyrNQe8UzA4RjYg.EgA4F0m1aTyaS99QuRWEzXd7b2gRNTgh0_THHwajRgcg.PNG/%3F%9D%B4%3F%86%9D%3F%9D%B8%3F%85%8C%EB%A6%AC%EC%96%B4_%EB%B3%B5%EC%82%AC%EB%B3%3F-1-001_%283%29.png?type=f238", tags: ["#태화동일신아파트", "#우드앤화이트"] },
+  { title: "달동 달동현대 3차 24평형 - 낡은 구축의 한계를 뛰어넘은 완벽한 공간 디자인 후기", link: "https://blog.naver.com/guseo109/223493023199", img: "https://postfiles.pstatic.net/MjAyNDA2MjdfMjM4/MDAxNzE5NDU2NTIxODk5.5yUXdGGjaE2QlQuV-oSuk9SCM5NVmmi9uxDWHWTtbr8g.LQPn5FcmprV-L3iOU0ijmCNWK3IVQLQFBvPVoD0-w2sg.PNG/%C0%CC%BC%D9%C0%CE%C5%D7%B8%AE%BE%EE_%BA%B9%BB%E7%BA%BB-001_%287%29.png?type=f238", tags: ["#달동현대3차", "#구축리모델링"] }
+];
+
+const page4DataRaw = [
+  { 
+      title: "[30평대] 울산 동구 전하동 전하아이파크 깔끔하고 세련된 화이트우드 인테리어 후기", 
+      link: "https://blog.naver.com/PostView.naver?blogId=guseo109&logNo=223488622234", 
+      img: "https://postfiles.pstatic.net/MjAyNDA2MjNfOTAg/MDAxNzE5MTI3ODE2NjA1.ZXQYuj4A2wS1FE9rXprlvIhZbQCPpYQZGG_PnkPwRikg._pTJzFxPBxfec53ER_IrYNRNP7Js0gz_CHIKKiEdmQUg.PNG/%C0%CC%BC%D9%C0%CE%C5%D7%B8%AE%BE%EE_%BA%B9%BB%E7%BA%BB-001_%286%29.png?type=f238", 
+      tags: ["#전하아이파크", "#화이트우드"] 
+  },
+  { 
+      title: "[30평대] 울산 동구 전하동 전하푸르지오 화이트 우드로 따뜻한 분위기의 30평대 인테리어 후기", 
+      link: "https://blog.naver.com/PostView.naver?blogId=guseo109&logNo=223475003317", 
+      img: "https://postfiles.pstatic.net/MjAyNDA2MTBfMTEz/MDAxNzE4MDA4NTkxODEz.BNnvcwpIi2ijU8eRIzzIOHhBzUXQsjKPpVbep5pIwhQg.nlPkJAvwsSXZ8XzMDi5SiFrcxVBclJ_lbbZg5nqJm-sg.PNG/%C0%CC%BC%D9%C0%CE%C5%D7%B8%AE%BE%EE_%BA%B9%BB%E7%BA%BB-001_%281%29.png?type=f238", 
+      tags: ["#전하푸르지오", "#따뜻한분위기"] 
+  },
+  { 
+      title: "[30평대] 울산 남구 야음동 신정현대홈타운3단지 깔끔한 화이트톤 30평대 리모델링 후기", 
+      link: "https://blog.naver.com/PostView.naver?blogId=guseo109&logNo=223458981348", 
+      img: "https://postfiles.pstatic.net/MjAyNDA1MjZfMTIg/MDAxNzE2NzA3Nzk0MTI4.ppbIf7sChymQEuKy7f95yb-Y7-bPuDA3fvaE5QgEAHMg.MC661Ew6HjxZT6kaQRGhdueLipIe1pPO3bnnE4bVtNcg.PNG/%C0%CC%BC%D9%C0%CE%C5%D7%B8%AE%BE%EE_%BA%B9%BB%E7%BA%BB-001.png?type=f238", 
+      tags: ["#신정현대홈타운", "#화이트톤"] 
+  },
+  { 
+      title: "[30평대] 울산 중구 태화동 일신아파트 전체 리모델링 화이트톤으로 완벽 변신한 후기", 
+      link: "https://blog.naver.com/PostView.naver?blogId=guseo109&logNo=223425566779", 
+      img: "https://postfiles.pstatic.net/MjAyNDA0MjRfMTkx/MDAxNzEzOTIzNjU3NDQ1.SFPG_lB9RfTGjLNoYvnBkYsuvNgAR-RmKvODZNBsYJAg.SjLsQaVg7tw52jHbHfBaN8IuKEEwl6t81g86RwRtxrEg.PNG/SE-113919fe-1dec-4b89-aed3-554d73d350e9.png?type=f238", 
+      tags: ["#태화동일신", "#전체리모델링"] 
+  },
+  { 
+      title: "[20평대] 울산 동구 화정동 엠코타운 이스턴베이 아늑한 베이지톤의 20평대 인테리어 후기", 
+      link: "https://blog.naver.com/PostView.naver?blogId=guseo109&logNo=223417221853", 
+      img: "https://postfiles.pstatic.net/MjAyNDA0MTVfMTA0/MDAxNzEzMTQ3ODEwOTEz.D07ZzphOuORAjqLNQS8NT8O_QJpgn_t8HhQ2oBqUGyIg.-FpXQABiuHT_SxF2ADtU3iCDO3lPrZ0dY4GfE1vXWcwg.PNG/%C6%F7%BD%BA%C6%AE-%C5%DB%C7%C3%B8%B4_%BA%B9%BB%E7%BA%BB-001_%288%29.png?type=f238", 
+      tags: ["#엠코타운이스턴베이", "#베이지톤"] 
+  },
+  { 
+      title: "[30평대] 울산 남구 무거동 위브자이 깔끔하고 세련된 화이트톤 30평대 리모델링 후기", 
+      link: "https://blog.naver.com/PostView.naver?blogId=guseo109&logNo=223387738317", 
+      img: "https://postfiles.pstatic.net/MjAyNDAzMThfMjUg/MDAxNzEwNzY5NzA3MzI1.M00W5W6UX8WSz8yACE_2_8j2fMC3jCnXna6p6fJllbQg.RQC4qp0DLGgKeM-oCcEmAY2JUW1R9E0F0qV6kazgRgQg.PNG/%C6%F7%BD%BA%C6%AE-%C5%DB%C7%C3%B8%B4_%BA%B9%BB%E7%BA%BB-001_%282%29.png?type=f238", 
+      tags: ["#무거위브자이", "#30평대"] 
+  },
+  { 
+      title: "[30평대] 울산 중구 다운동 다운아파트 화이트 우드로 완성한 따뜻한 30평대 인테리어 후기", 
+      link: "https://blog.naver.com/PostView.naver?blogId=guseo109&logNo=223380211827", 
+      img: "https://postfiles.pstatic.net/MjAyNDAzMTFfMTM0/MDAxNzEwMTUxNDk1MDA3.zYrBBxbCl2SuUgeMRa6egYiXt6uKe46aooceczTUC2sg.RHur7PEpwuTxAysWCa0x7fdVDQEEzA899fQ_RQpvlmQg.PNG/image_%284%29.png?type=f238", 
+      tags: ["#다운아파트", "#화이트우드"] 
+  },
+  { 
+      title: "[30평대] 울산 중구 태화동 동부아파트 깔끔하고 세련된 화이트 모던 인테리어 후기", 
+      link: "https://blog.naver.com/PostView.naver?blogId=guseo109&logNo=223373713383", 
+      img: "https://postfiles.pstatic.net/MjAyNDAzMDVfNzYg/MDAxNzA5NjExNTU3MDQ3.9vyFPvk00Rw_fencSpKIRDXUvCdfIU5LbI7M8qICRXsg.ococ8t2h5KNOKYAxGpnQx0ul5L8KCc4UaNy1KwLs8FAg.PNG/image_%284%29.png?type=f238", 
+      tags: ["#태화동동부아파트", "#모던인테리어"] 
+  },
+  { 
+      title: "[20평대] 울산 북구 천곡동 삼성코아루 심플하고 모던한 20평대 리모델링 후기", 
+      link: "https://blog.naver.com/PostView.naver?blogId=guseo109&logNo=223184138578", 
+      img: "https://postfiles.pstatic.net/MjAyMzA4MTVfMjcx/MDAxNjkyMDc0MjEyNjY4.R_qYKlHpW-yNYtJo6-XJHbR3ynwaz22NzNGnOY8yV_Ug.IJGW118EVURcOjsW0gVhD3JVLIOHCvyGmfpTBhREMWcg.JPEG.guseo109/KakaoTalk_20230813_192350305_01.jpg?type=f238", 
+      tags: ["#천곡삼성코아루", "#심플모던"] 
+  },
+  { 
+      title: "[30평대] 울산 동구 화정동 엠코타운 이스턴베이 아늑하고 세련된 30평대 인테리어 후기", 
+      link: "https://blog.naver.com/PostView.naver?blogId=guseo109&logNo=223173658746", 
+      img: "https://postfiles.pstatic.net/MjAyMzA4MDNfODMg/MDAxNjkxMDMwNzcyMjY2.ryT3ftNqNZ9CGC3k12xFjMaqVg01Y7E_x38QABZRt2Ig.OZjYwGV-EPVBH6f-R0TPvZ5zOWGrIn1PR12l_XMalqUg.JPEG.guseo109/KakaoTalk_20230202_000553175_01.jpg?type=f238", 
+      tags: ["#엠코타운이스턴베이", "#아늑한공간"] 
+  },
+  { 
+      title: "[30평대] 울산 동구 전하동 전하아이파크 화사하고 깔끔한 30평대 리모델링 후기", 
+      link: "https://blog.naver.com/PostView.naver?blogId=guseo109&logNo=223160961449", 
+      img: "https://postfiles.pstatic.net/MjAyMzA3MTlfMjEy/MDAxNjg5NzczMzgxNDMz.cFD2IT-RtyUjQYan2FTDAN8nv6q7V3US8x6IBbuyS9wg.daQ5OkNbSxpVXPJeN45r6S4MZQ3k15nJ9gMzUJqzVvYg.JPEG.guseo109/KakaoTalk_20221004_214225614_05.jpg?type=f238", 
+      tags: ["#전하아이파크", "#화사한공간"] 
+  },
+  { 
+      title: "[20평대] 울산 북구 매곡동 매곡푸르지오 깔끔하고 모던한 20평대 인테리어 후기", 
+      link: "https://blog.naver.com/PostView.naver?blogId=guseo109&logNo=223157836853", 
+      img: "https://postfiles.pstatic.net/MjAyMzA3MTZfMjQw/MDAxNjg5NTA4MDA5Mjc3.6lMxrrFlOIOM2-4ro381moGcW5Hsi8OQfO_1n6jQR9Qg.KNpQFtlA22BqQYlcfP12xjd1eTXoR85hIfnlvCiK8Cgg.JPEG.guseo109/KakaoTalk_20230202_001013417_11.jpg?type=f238", 
+      tags: ["#매곡푸르지오", "#20평대"] 
+  },
+  { 
+      title: "[20평대] 울산 동구 전하동 전하푸르지오 심플하고 세련된 20평대 인테리어 후기", 
+      link: "https://blog.naver.com/PostView.naver?blogId=guseo109&logNo=223022346456", 
+      img: "https://postfiles.pstatic.net/MjAyMzAyMjBfMTA2/MDAxNjc2OTAyNDE3NTMx.aO0cGvC0IvcDPn-Ap81xXTB0PY-2_jIeuvBstLzHstQg.kS_yF1hzF3BIGyORp-CI03BKvfh7cvEB48sop5MuDlMg.JPEG.guseo109/1676803137622.jpg?type=f238", 
+      tags: ["#전하푸르지오", "#세련된인테리어"] 
+  },
+  { 
+      title: "[40평대] 울산 동구 서부동 서부현대패밀리 화사한 40평대 리모델링 후기", 
+      link: "https://blog.naver.com/PostView.naver?blogId=guseo109&logNo=223003561377", 
+      img: "https://postfiles.pstatic.net/MjAyMzAyMDJfNSAg/MDAxNjc1MzQ3NDY3MzYx.koaIkIHjySK4AjRSxanKEbgz9IkIzaR8ivGb2ATcyMYg.X_-DEIhd1JHihE87CXum2ewaqHXxs6Bohhp2Dps0beUg.JPEG.guseo109/KakaoTalk_20221103_124800999_02.jpg?type=f238", 
+      tags: ["#현대패밀리서부", "#40평대"] 
+  },
+  { 
+      title: "[30평대] 울산 동구 화정동 힐스테이트이스턴베이 모던하고 깔끔한 30평대 리모델링 후기", 
+      link: "https://blog.naver.com/PostView.naver?blogId=guseo109&logNo=222891851747", 
+      img: "https://postfiles.pstatic.net/MjAyMjEwMDRfMzAw/MDAxNjY0ODg4MzY3MDYw.Dw9zB_HJspsslf8ckA3Bck8dNoBy3OeJYRHwc1N7Tgkg.WLdcPY7CdpyRxPXBCaRAgPH1_d34BHsLnb44ASWBgrYg.JPEG.guseo109/KakaoTalk_20221004_214212554.jpg?type=f238", 
+      tags: ["#힐스테이트이스턴베이", "#모던인테리어"] 
+  },
+  { 
+      title: "[30평대] 울산 북구 매곡동 월드메르디앙 따뜻하고 아늑한 30평대 인테리어 후기", 
+      link: "https://blog.naver.com/PostView.naver?blogId=guseo109&logNo=222881710341", 
+      img: "https://postfiles.pstatic.net/MjAyMjA5MjJfMjAz/MDAxNjYzODQ5MzYwNTA2.qBP4WVOCknFY0sfGz2JFw7TTX4RXU83cwHo8UO4mj-og.tOV13WA-lN-6M1Hw0N8-EFqOelup-GQrkzW9A-F4ERQg.JPEG.guseo109/KakaoTalk_20220922_172133075_10.jpg?type=f238", 
+      tags: ["#매곡월드메르디앙", "#따뜻한공간"] 
+  }
+];
+
+const page5DataRaw = [
+    { 
+      title: "울산인테리어 울산 중구 반구동 한라그랜드맨션 인테리어 이솝인테리어", 
+      tags: ["#반구동한라그랜드맨션", "#울산인테리어"], 
+      img: "https://postfiles.pstatic.net/MjAyMjA5MDJfMjQz/MDAxNjYyMTEwNjMwNjgx.KLyCtzoPGBJ5i3PeiluaH54fonvVd0P12DEiAcH0_04g.oed6lkc87w5z7_zX_hJovvdPcNxTN555XlvoAaP4x4gg.JPEG.guseo109/KakaoTalk_20220607_174331606_13.jpg?type=f238", 
+      link: "https://blog.naver.com/PostView.naver?blogId=guseo109&logNo=222865140105&categoryNo=8&parentCategoryNo=&from=thumbnailList" 
+    },
+    { 
+      title: "울산인테리어, 이솝스터디카페 울산하이야트점 인테리어, 이솝인테리어", 
+      tags: ["#이솝스터디카페", "#상공간인테리어"], 
+      img: "https://postfiles.pstatic.net/MjAyMjA4MzFfMTkg/MDAxNjYxOTIwNjIwNzUz.fzepDP03BX82LS6XVWnSHfSnS0eUDA4QPbeabV5uSJkg.8YkzDgqjmu6P1enYpq7_WWsmGt1uLWNNat4-wt28t4Eg.JPEG.guseo109/KakaoTalk_20220829_202842581_21.jpg?type=f238", 
+      link: "https://blog.naver.com/PostView.naver?blogId=guseo109&logNo=222862989382&categoryNo=8&parentCategoryNo=&from=thumbnailList" 
+    },
+    { 
+      title: "울산인테리어, 울산 북구 화봉동 동아청구아파트 세입자용 인테리어, 이솝인테리어", 
+      tags: ["#화봉동동아청구", "#세입자인테리어"], 
+      img: "https://postfiles.pstatic.net/MjAyMjA4MjlfMjA1/MDAxNjYxNzU4MjE0MjUx.946c2DnKwEDHfxT1sdJZ1fqVD_1J3k8H_BbWz1IGMPsg.1N-V9gWfP0TvYa5snGoIn9kC599xNV8K6Yo9xiqkRRUg.JPEG.guseo109/KakaoTalk_20220829_161839656_06.jpg?type=f238", 
+      link: "https://blog.naver.com/PostView.naver?blogId=guseo109&logNo=222861297617&categoryNo=8&parentCategoryNo=&from=thumbnailList" 
+    },
+    { 
+      title: "울산인테리어, 경남 양산시 평산동 새진흥7차 인테리어, 이솝인테리어", 
+      tags: ["#양산인테리어", "#평산동새진흥7차"], 
+      img: "https://postfiles.pstatic.net/MjAyMjA4MjNfMTk2/MDAxNjYxMjQyNzI4MDQz.9mOJUVLZg5hUHhnZqOTPrHnj2XpfGGASGlFVOI5fUlkg.tZol6AdCLFML5O4qMB-tftsdCNDojU3yhEF_ZnDd7dUg.JPEG.guseo109/KakaoTalk_20220823_164054511_19.jpg?type=f238", 
+      link: "https://blog.naver.com/PostView.naver?blogId=guseo109&logNo=222856187200&categoryNo=8&parentCategoryNo=&from=thumbnailList" 
+    },
+    { 
+      title: "울산인테리어, 울산 북구 구유동 뷰레스트 풀빌라 인테리어", 
+      tags: ["#뷰레스트풀빌라", "#풀빌라인테리어"], 
+      img: "https://postfiles.pstatic.net/MjAyMjA4MjBfMjE1/MDAxNjYwOTg4MDAzNDc0.c6m2UYBjtmf1XmFUpHKeaVcRzmzx67wugnEARDncg3cg.P1vZ3x17T949FF0-b62lf_tN4IoLJlzgNu2TKkMhd8kg.JPEG.guseo109/KakaoTalk_20220712_191411076_04.jpg?type=f238", 
+      link: "https://blog.naver.com/PostView.naver?blogId=guseo109&logNo=222853601143&categoryNo=8&parentCategoryNo=&from=thumbnailList" 
+    },
+    { 
+      title: "울산인테리어, 울산 동구 손오공마라탕 인테리어, 이솝인테리어,울산 동구 마라탕", 
+      tags: ["#손오공마라탕", "#상공간인테리어"], 
+      img: "https://postfiles.pstatic.net/MjAyMjA3MTdfMTg3/MDAxNjU4MDM4ODUyNTYz.5MNJ7wvsvJ6yw4cz6MwHOhlYbu83O_9LeUH8O3JJbzAg.70XhuPBRRZnPwVpDIozqRi2ktoLYGwI9kbrpOO0ZWNIg.JPEG.guseo109/KakaoTalk_20220713_184809474_05.jpg?type=f238", 
+      link: "https://blog.naver.com/PostView.naver?blogId=guseo109&logNo=222815588329&categoryNo=8&parentCategoryNo=&from=thumbnailList" 
+    },
+    { 
+      title: "울산인테리어, 이솝스터디카페 옥동점", 
+      tags: ["#이솝스터디카페", "#상공간인테리어"], 
+      img: "https://postfiles.pstatic.net/MjAyMjA2MDdfMTI1/MDAxNjU0NTk0Mjk1NzE1.y_ccxkgrnYfrVKzaBlBzPTG4wzLZiPC-sOOMpPz3pU0g.Ta4wiq7XMCbKuy1KbArrILTqpGKHbn-Lx254Syx4znsg.JPEG.guseo109/KakaoTalk_20220607_174031981.jpg?type=f238", 
+      link: "https://blog.naver.com/PostView.naver?blogId=guseo109&logNo=222763436843&categoryNo=8&parentCategoryNo=&from=thumbnailList" 
+    },
+    { 
+      title: "울산인테리어, 울산 동구 전하패밀리 인테리어, 이솝인테리어", 
+      tags: ["#전하패밀리", "#아파트인테리어"], 
+      img: "https://postfiles.pstatic.net/MjAyMjA1MDNfMjEw/MDAxNjUxNTcxNTEzNDk3.9EUfaGiGpvl8m1AIDt1i7zq9qOVXpw8ovem2pEupXOgg.X8EQHScSC4zJikyN8hX_8yEokjJ5yg6N5byaoUCkKbwg.JPEG.guseo109/KakaoTalk_20220503_183258289_03.jpg?type=f238", 
+      link: "https://blog.naver.com/PostView.naver?blogId=guseo109&logNo=222719860776&categoryNo=8&parentCategoryNo=&from=thumbnailList" 
+    },
+    { 
+      title: "울산인테리어, 울산 남구 옥동 한진전원 인테리어, 이솝인테리어", 
+      tags: ["#옥동한진전원", "#울산인테리어"], 
+      img: "https://postfiles.pstatic.net/MjAyMjA0MDFfMjQw/MDAxNjQ4ODA5MDM4NTE5.BMZkhrTdT4gvSFxaEXwSE78WucjK62A69gKKl20MrrQg.L3lEDLVQF_n0jPMC4jMeHtIwB4VUje8lascIpVvJxFAg.JPEG.guseo109/1572000955686.jpg?type=f238", 
+      link: "https://blog.naver.com/PostView.naver?blogId=guseo109&logNo=222689168690&categoryNo=8&parentCategoryNo=&from=thumbnailList" 
+    },
+    { 
+      title: "울산인테리어, 울산 북구 신천동 한라신천지아파트 인테리어, 이솝인테리어", 
+      tags: ["#한라신천지아파트", "#아파트인테리어"], 
+      img: "https://postfiles.pstatic.net/MjAyMjAzMzFfMjI0/MDAxNjQ4NzE3ODY5MTc4.1Yni8ggCWVWsVwMOQPE_jGhbQgMMSTTf-qcoLc0EBJkg.ku12OCGlxoLec14mGM3ffaWRSTuuTd16re9mCZCACI4g.JPEG.guseo109/1596630583621.jpg?type=f238", 
+      link: "https://blog.naver.com/PostView.naver?blogId=guseo109&logNo=222688139994&categoryNo=8&parentCategoryNo=&from=thumbnailList" 
+    },
+    { 
+      title: "울산인테리어, 울산리모델링, 울산 동구 파라다이스 아파트 인테리어", 
+      tags: ["#동구파라다이스", "#울산리모델링"], 
+      img: "https://postfiles.pstatic.net/MjAyMjAzMzBfMjI0/MDAxNjQ4NjMzMDM5Mzkx.3nDs3PJrr42_Dlgs6kPnpdgKmiiFaALRVwlH2_bZW3Ug.C_qNd6nEfxf0oiZ1VDyGrUH9e9idNTpLUaoiihUBwV8g.JPEG.guseo109/1586334169383.jpg?type=f238", 
+      link: "https://blog.naver.com/PostView.naver?blogId=guseo109&logNo=222687201878&categoryNo=8&parentCategoryNo=&from=thumbnailList" 
+    },
+    { 
+      title: "울산인테리어, 울산 남구 무거현대아파트 인테리어, 세입자인테리어", 
+      tags: ["#무거현대아파트", "#세입자인테리어"], 
+      img: "https://postfiles.pstatic.net/MjAyMjAzMjlfMTk1/MDAxNjQ4NTQ3ODMwODQ1.rOHqTXLl46zkIBtu1AANahdN_BEuUTTJ1_SDYWJ3HKkg.kEGngTWGm0AjeHh4AIXx8dVlvQEa1hORLscHErr0vT4g.JPEG.guseo109/1606276237388.jpg?type=f238", 
+      link: "https://blog.naver.com/PostView.naver?blogId=guseo109&logNo=222686267431&categoryNo=8&parentCategoryNo=&from=thumbnailList" 
+    },
+    { 
+      title: "울산인테리어, 울산 북구 명촌동 평창리비에르 인테리어", 
+      tags: ["#명촌평창리비에르", "#아파트인테리어"], 
+      img: "https://postfiles.pstatic.net/MjAyMjAzMjZfMjkz/MDAxNjQ4Mjg4MTA1NzM2.C1oP3_bwvgQOtck4RizypjACvnZfWGR5173EcyVjEN4g.-tf42Vc1ax2aXi8ZHB2Eqp5_BsJEcJ_OJu4p2JJT-nog.JPEG.guseo109/KakaoTalk_20220325_234752418_01.jpg?type=f238", 
+      link: "https://blog.naver.com/PostView.naver?blogId=guseo109&logNo=222683642246&categoryNo=8&parentCategoryNo=&from=thumbnailList" 
+    },
+    { 
+      title: "울산인테리어, 부산인테리어, 부산 사하구 다대동 삼환아파트 인테리어", 
+      tags: ["#부산인테리어", "#다대동삼환아파트"], 
+      img: "https://postfiles.pstatic.net/MjAyMjAzMjRfMjIz/MDAxNjQ4MTIzOTY2NTk5.F-OVG4hWIm-PF6NmQNIvS1cB3Rv9M1RumpeZ0x6j83Eg.svzLPRVilkSTNyafUzZXoDOcHy9HVmtWiwxBMkTcQpcg.JPEG.guseo109/20190110_163537.jpg?type=f238", 
+      link: "https://blog.naver.com/PostView.naver?blogId=guseo109&logNo=222682075499&categoryNo=8&parentCategoryNo=&from=thumbnailList" 
+    },
+    { 
+      title: "울산인테리어, 울산 북구 신천 협성노블리스 인테리어", 
+      tags: ["#신천협성노블리스", "#울산인테리어"], 
+      img: "https://postfiles.pstatic.net/MjAyMjAzMjNfMzgg/MDAxNjQ4MDI4MTYzMTI0.Fz98Bqy6UL_GjrZZHqoOHkwXepEU557Amb1RxgHUhYgg.g5P3SVQkDL1AgoRv9uxnaiJ4Da1IRudCwwrimlE8NAMg.JPEG.guseo109/1544864012178.jpg?type=f238", 
+      link: "https://blog.naver.com/PostView.naver?blogId=guseo109&logNo=222680998259&categoryNo=8&parentCategoryNo=&from=thumbnailList" 
+    },
+    { 
+      title: "울산인테리어, 울산 중구 태화동 진영동부아파트 인테리어, 울산세입자용 인테리어", 
+      tags: ["#진영동부아파트", "#세입자인테리어"], 
+      img: "https://postfiles.pstatic.net/MjAyMjAzMjFfNzQg/MDAxNjQ3ODUzMTY3Mzk2.DTGiAu7zrOj8QF-Ma8Di9zZrC3wz2-25xSa2AxT0820g.bnZ7mKI-mlBKlcJfJpRZAu7s53s5B0ye_7Q4kKIPtvAg.JPEG.guseo109/KakaoTalk_20220316_232018486_06.jpg?type=f238", 
+      link: "https://blog.naver.com/PostView.naver?blogId=guseo109&logNo=222679008256&categoryNo=8&parentCategoryNo=&from=thumbnailList" 
+    }
+  ];
+
+const page6DataRaw = [
+    { 
+      title: "울산 인테리어 울산 북구청 인테리어 강의", 
+      tags: ["#북구청", "#인테리어강의"], 
+      img: "https://postfiles.pstatic.net/MjAyMjAzMThfMjM4/MDAxNjQ3NTgyMjU4NjIz.K7XTi6OtTYMge37FJi-6TJRKxrtwsaEzh9aLu5wbYzUg.30MXhewc1VVNq-JNOT43gJckJAsP0ymm_sL1qwAjY-Qg.JPEG.guseo109/KakaoTalk_20220316_232140038_01.jpg?type=f238", 
+      link: "https://blog.naver.com/PostView.naver?blogId=guseo109&logNo=222676329604&categoryNo=8&parentCategoryNo=&from=thumbnailList" 
+    },
+    { 
+      title: "울산 북구 쌍용아진 인테리어", 
+      tags: ["#쌍용아진", "#울산인테리어"], 
+      img: "https://postfiles.pstatic.net/MjAyMjAzMTZfMyAg/MDAxNjQ3NDI0Mzg4NDQ2.QNyr8tIZ0oJKUsHMCAF-ZTyTwbSe8y_tMOfOxITzCcAg.LjhguaZqhEOGEYgJiAWrw9cNhv7V1RV8_vc1etJGI-Yg.JPEG.guseo109/KakaoTalk_20220310_223841872_06.jpg?type=f238", 
+      link: "https://blog.naver.com/PostView.naver?blogId=guseo109&logNo=222674573328&categoryNo=8&parentCategoryNo=&from=thumbnailList" 
+    },
+    { 
+      title: "부산 인테리어 부산 남구 용호동 메트로시티 70평대 인테리어", 
+      tags: ["#용호동메트로시티", "#부산인테리어"], 
+      img: "https://postfiles.pstatic.net/MjAyMjAzMTRfMjUw/MDAxNjQ3MjU4MjEzODE1.cGd4bV1kz0mMir8I7HTRzQhaOby5JhtjnaxvW5SbfKcg.BuUduJi5pVwG4ZjLeQ1QU5p2E0xy2w0FcrgKUXYPs4gg.JPEG.guseo109/KakaoTalk_20220311_142437957_24.jpg?type=f238", 
+      link: "https://blog.naver.com/PostView.naver?blogId=guseo109&logNo=222672678442&categoryNo=8&parentCategoryNo=&from=thumbnailList" 
+    },
+    { 
+      title: "울산 북구 염포쌍데빌 인테리어", 
+      tags: ["#염포쌍데빌", "#울산인테리어"], 
+      img: "https://postfiles.pstatic.net/MjAyMjAyMjNfMjE2/MDAxNjQ1NjAyNTcwNDY3.FtUeSuwS-Or6o7a58riwFVVGoFksUMNphkZkHpvVyYQg.fqfLMd41m7XsSu6ACEOIC6LzjjMY2dKS6tY07TVTmxAg.JPEG.guseo109/KakaoTalk_20220209_143151257.jpg?type=f238", 
+      link: "https://blog.naver.com/PostView.naver?blogId=guseo109&logNo=222655790557&categoryNo=8&parentCategoryNo=&from=thumbnailList" 
+    },
+    { 
+      title: "울산 인테리어, 울산 북구 상안동 쌍용아진 아파트 인테리어", 
+      tags: ["#상안동쌍용아진", "#아파트인테리어"], 
+      img: "https://postfiles.pstatic.net/MjAyMjAyMTRfMjQ1/MDAxNjQ0ODMzOTU4OTY1.fGlh5L29cHdIt8CFtGzrTjn9zb2kq6tnyHYDK-OG7P0g.cAkSYDetDROAh9szohh1p0Mtnk08AJZ7PZAYN8UaDBUg.JPEG.guseo109/KakaoTalk_20211221_192510544_04.jpg?type=f238", 
+      link: "https://blog.naver.com/PostView.naver?blogId=guseo109&logNo=222647539342&categoryNo=8&parentCategoryNo=&from=thumbnailList" 
+    },
+    { 
+      title: "울산 인테리어, 울산 북구 매곡동 현대파크맨션 인테리어", 
+      tags: ["#현대파크맨션", "#아파트인테리어"], 
+      img: "https://postfiles.pstatic.net/MjAyMjAyMTBfMjUw/MDAxNjQ0NDc0NjgwODI2.hVLxZM4ropV7Zxs2E8hjHNRIO0umhunKgrG2RsQrPKwg.t3IGr-j29hRQZsCBstEj-PrZzXm-ec9eNGcBOEDuhYEg.JPEG.guseo109/KakaoTalk_20220204_173443003_14.jpg?type=f238", 
+      link: "https://blog.naver.com/PostView.naver?blogId=guseo109&logNo=222644001040&categoryNo=8&parentCategoryNo=&from=thumbnailList" 
+    },
+    { 
+      title: "이솝 스터디카페 함안점", 
+      tags: ["#이솝스터디카페", "#상공간인테리어"], 
+      img: "https://postfiles.pstatic.net/MjAyMjAyMDZfMjk1/MDAxNjQ0MTM1OTUyMjA0.zB3j1KulCsS-nsE5GPENAPcLGg2cWLtHBXRgnsNuXf0g.zmJr6dPTST-11ffpakh8h-L6-mzUEQXFQwiwPAWLjQ4g.JPEG.guseo109/KakaoTalk_20220206_172410717.jpg?type=f238", 
+      link: "https://blog.naver.com/PostView.naver?blogId=guseo109&logNo=222640376281&categoryNo=8&parentCategoryNo=&from=thumbnailList" 
+    },
+    { 
+      title: "울산 인테리어, 울산 북구 상안동 쌍용아진 인테리어", 
+      tags: ["#상안동쌍용아진", "#울산인테리어"], 
+      img: "https://postfiles.pstatic.net/MjAyMjAyMDRfMTUz/MDAxNjQzOTgwNzI2OTA4.HldqN6Ft_sPcD5l1mQvHz2cbiggDiktNd9Vaadc0lSMg.DOH_W2FfI_rxBO5svJ_wQ-T1zqQM8THhx3mWNwhUYAsg.JPEG.guseo109/KakaoTalk_20220204_173449735_02.jpg?type=f238", 
+      link: "https://blog.naver.com/PostView.naver?blogId=guseo109&logNo=222639120723&categoryNo=8&parentCategoryNo=&from=thumbnailList" 
+    },
+    { 
+      title: "울산 인테리어, 울산 북구 쌍용아진 인테리어", 
+      tags: ["#쌍용아진", "#아파트인테리어"], 
+      img: "https://postfiles.pstatic.net/MjAyMTEyMjdfNyAg/MDAxNjQwNjA1MDAyNTY0.ISiu9-I0Ca9pHUqbYmGg0TBrBsR8LtqvtqpPKJMXg28g.VBDUJKFlgnu2aDRm7WhzvzreVaN7m-s9-_tLvAuw5A0g.JPEG.guseo109/KakaoTalk_20211221_192523618_11.jpg?type=f238", 
+      link: "https://blog.naver.com/PostView.naver?blogId=guseo109&logNo=222606116234&categoryNo=8&parentCategoryNo=&from=thumbnailList" 
+    },
+    { 
+      title: "울산 부산 반영구샵 네일샵 피부관리샵 미용샵 인테리어", 
+      tags: ["#미용샵인테리어", "#상공간인테리어"], 
+      img: "https://postfiles.pstatic.net/MjAyMTEyMTdfMTcw/MDAxNjM5NzMxNzYwOTUx.FmpuRVecuwqKUPNoVaKSqnrn7qWQBOIki-hhnvsYdzQg.3n2_BHMzrxxmyQ450r4tUJMkIhZVccvVIlypkGpHk70g.JPEG.guseo109/KakaoTalk_20211206_160439725_22.jpg?type=f238", 
+      link: "https://blog.naver.com/PostView.naver?blogId=guseo109&logNo=222598037580&categoryNo=8&parentCategoryNo=&from=thumbnailList" 
+    },
+    { 
+      title: "울산 인테리어 울산 북구 명촌동 평창 리비에르 인테리어", 
+      tags: ["#명촌평창리비에르", "#아파트인테리어"], 
+      img: "https://postfiles.pstatic.net/MjAyMTEyMDlfNDEg/MDAxNjM5MDM2Nzg1NjI3.hw2jNxGUXTwJf_o0QlXt4iTXyf6Lf_ivqw7z5A9N6V4g.XUo71gK_cURSkZMjjnCVkaAggZq7yXqn2qr56vVrHVIg.JPEG.guseo109/KakaoTalk_20211206_155716573_02.jpg?type=f238", 
+      link: "https://blog.naver.com/PostView.naver?blogId=guseo109&logNo=222645365857&categoryNo=8&parentCategoryNo=&from=thumbnailList" 
+    },
+    { 
+      title: "울산 인테리어 울산 중구 우정동 우정선경 아파트 인테리어", 
+      tags: ["#우정선경", "#울산인테리어"], 
+      img: "https://postfiles.pstatic.net/MjAyMTEyMTBfNTMg/MDAxNjM5MTI0Mzc5NjU2.u8h4FB3Zxm105_RjwwVCWlsIxQzFEUu43dVYz5U19ukg.MR34BduJjNocQSCLFA8ehsQaYC36CEvEv9o_7ahqbDsg.JPEG.guseo109/KakaoTalk_20211206_160057165_13.jpg?type=f238", 
+      link: "https://blog.naver.com/PostView.naver?blogId=guseo109&logNo=222642365857&categoryNo=8&parentCategoryNo=&from=thumbnailList" 
+    },
+    { 
+      title: "울산 인테리어, 울산 동구 전하동 전하 패밀리 인테리어", 
+      tags: ["#전하패밀리", "#아파트인테리어"], 
+      img: "https://postfiles.pstatic.net/MjAyMTEyMDlfMjg1/MDAxNjM5MDM3MjIyMzg2.tb2dM_iwWyrmhUpQPhZFXktdm38KfeqQ3gYl0S7Bmrgg.wQrLcrgv-yLVjFdSY9ftUQZoo1kRzjIdq-9Ym42jOGAg.JPEG.guseo109/KakaoTalk_20211206_155947272_01.jpg?type=f238", 
+      link: "https://blog.naver.com/PostView.naver?blogId=guseo109&logNo=222591184211&categoryNo=8&parentCategoryNo=&from=thumbnailList" 
+    },
+    { 
+      title: "울산 인테리어, 울산 남구 삼산동 피부 관리샵 인테리어", 
+      tags: ["#피부관리샵", "#상공간인테리어"], 
+      img: "https://postfiles.pstatic.net/MjAyMTEyMDhfMTQ2/MDAxNjM4OTY2NDEwOTI3.6ZJR52TIZHDaVpBdmCDOSM7triLChcZYI-dgJJP-PBgg.JfPW6BU9lpjKzWNMx_R97PSnTFmUT_cH_5uoMgpXJYMg.JPEG.guseo109/KakaoTalk_20211208_210342761.jpg?type=f238", 
+      link: "https://blog.naver.com/PostView.naver?blogId=guseo109&logNo=222590326129&categoryNo=8&parentCategoryNo=&from=thumbnailList" 
+    },
+    { 
+      title: "울산 인테리어, 울산 남구 신정동 신성미소지움 인테리어", 
+      tags: ["#신성미소지움", "#아파트인테리어"], 
+      img: "https://postfiles.pstatic.net/MjAyMTEyMDdfMiAg/MDAxNjM4ODc4NTQzMzM3.le9LT35PYosz9h5QzE6VgSqkLgmBEaYhS1FxD__DjNMg.qwaKxJ5WMR-B3DQ-yvYKgWjyQ4aOxqAC6PUfdc3dksYg.JPEG.guseo109/KakaoTalk_20211206_160310517_17.jpg?type=f238", 
+      link: "https://blog.naver.com/PostView.naver?blogId=guseo109&logNo=222589365339&categoryNo=8&parentCategoryNo=&from=thumbnailList" 
+    },
+    { 
+      title: "울산 인테리어, 울산 중구 우정동 선경 아파트 인테리어", 
+      tags: ["#우정동선경아파트", "#아파트인테리어"], 
+      img: "https://postfiles.pstatic.net/MjAyMTEyMDZfMTQ4/MDAxNjM4Nzc4MzUxNDE4.o7Vrmy2qdvU8wKXIxL6QGPYFdLwXcqUTOyBXZf8Vkscg.JFyu7atTPVFiI3Lp4mOSLEOraeuAYX8W6nxI7TO2k5Yg.JPEG.guseo109/KakaoTalk_20211203_173842395_01.jpg?type=f238", 
+      link: "https://blog.naver.com/PostView.naver?blogId=guseo109&logNo=222588262663&categoryNo=8&parentCategoryNo=&from=thumbnailList" 
+    }
+  ];
+
+const page7DataRaw = [
+  { 
+    title: "울산 중구 서동 서동현대 아파트 인테리어", 
+    tags: ["#서동현대", "#아파트인테리어"], 
+    img: "https://postfiles.pstatic.net/MjAyMTEyMDNfMjM5/MDAxNjM4NTI5Mjg4ODA1.tIZjwvfmv12FKLlFXyAJQdXAEVQ_Yr0vfP-U4oplGQIg.QnTxi5wrhjpXIwdc70YVihKTUxRYiLC87XL4vaUcnWgg.JPEG.guseo109/KakaoTalk_20211201_204149848_03.jpg?type=f238", 
+    link: "https://blog.naver.com/PostView.naver?blogId=guseo109&logNo=222586117159&categoryNo=8&parentCategoryNo=&from=thumbnailList" 
+  },
+  { 
+    title: "울산 남구 옥동 서강파크 아파트인테리어", 
+    tags: ["#옥동서강파크", "#울산인테리어"], 
+    img: "https://postfiles.pstatic.net/MjAyMTEyMDJfNzUg/MDAxNjM4NDM5OTIyNjMx.rLidQiZj4Zvsywe7WW79ihsChyGYHGtktm23LMpX1uAg.MhnfkL2znLaF1SMreT3gEUqaXG1eHmujejhaDBMeLN0g.JPEG.guseo109/KakaoTalk_20211201_203530962_17.jpg?type=f238", 
+    link: "https://blog.naver.com/PostView.naver?blogId=guseo109&logNo=222585140775&categoryNo=8&parentCategoryNo=&from=thumbnailList" 
+  },
+  { 
+    title: "울산 중구 성안동 성안청구타운 아파트", 
+    tags: ["#성안청구타운", "#아파트인테리어"], 
+    img: "https://postfiles.pstatic.net/MjAyMTEyMDFfNTMg/MDAxNjM4MzQ0OTQ4OTQx.NRedWIuP3szrv3nP5vaSPag9jGRUV9j_ibaUz6pKg_8g.hIMUYMM3jVxU4Fe_Elif2w6w3R819wwnIR16Q8JozoMg.JPEG.guseo109/KakaoTalk_20211126_132718455_14.jpg?type=f238", 
+    link: "https://blog.naver.com/PostView.naver?blogId=guseo109&logNo=222584000067&categoryNo=8&parentCategoryNo=&from=thumbnailList" 
+  },
+  { 
+    title: "울산 중구 성안동 쌍용아진 아파트 인테리어", 
+    tags: ["#성안동쌍용아진", "#울산인테리어"], 
+    img: "https://postfiles.pstatic.net/MjAyMTExMzBfMTE0/MDAxNjM4MjU3NjAwODI4.r2JimaDBWGbf-QzqVHhPVgkPyuaf8cWw3dyt7zNiKwAg.hhANJhroQ5VB3MJKn6iLHh1045NWmwOQdhitLQ8KN94g.JPEG.guseo109/KakaoTalk_20211123_110544594_01.jpg?type=f238", 
+    link: "https://blog.naver.com/PostView.naver?blogId=guseo109&logNo=222582963991&categoryNo=8&parentCategoryNo=&from=thumbnailList" 
+  },
+  { 
+    title: "울산 인테리어 울산 빌라 인테리어", 
+    tags: ["#빌라인테리어", "#맞춤형인테리어"], 
+    img: "https://postfiles.pstatic.net/MjAyMTExMjlfMTE0/MDAxNjM4MTcyNTY3MjA1.Dj2YtvjvaYzjYaryMriNqT6gA5izF50sTAil0jE41sAg.u4Q4-Pw01dAWbSJVXa1H0s0LYe3z1e_cFYglK_GcF00g.JPEG.guseo109/KakaoTalk_20211124_153254323_01.jpg?type=f238", 
+    link: "https://blog.naver.com/PostView.naver?blogId=guseo109&logNo=222581977274&categoryNo=8&parentCategoryNo=&from=thumbnailList" 
+  },
+  { 
+    title: "울산 동구 동부패밀리 아파트", 
+    tags: ["#동부패밀리아파트", "#울산인테리어"], 
+    img: "https://postfiles.pstatic.net/MjAyMTExMjdfMTg2/MDAxNjM4MDEzMzU0OTk0.Rm154N1oWf6PNN_SAnB7UNsYmCcYwK3pK-PXfLdH3LUg.pJS6XqEuG6m01L3eAbtwKK8dZ3DGU0aN93bFzsQjO2wg.JPEG.guseo109/KakaoTalk_20211125_103329906.jpg?type=f238", 
+    link: "https://blog.naver.com/PostView.naver?blogId=guseo109&logNo=222580404566&categoryNo=8&parentCategoryNo=&from=thumbnailList" 
+  },
+  { 
+    title: "울산 이솝스터디카페 문소로점", 
+    tags: ["#이솝스터디카페", "#상공간인테리어"], 
+    img: "https://postfiles.pstatic.net/MjAyMTExMjRfMjcz/MDAxNjM3NzQ0MjY5MjE1.C1YqiqkbeQxT-StP0YblCV8_ECz5xVrph_X7IfPOEBcg.IP6JCC1lubtu4lVyvOMo5luk416JdDFha9-ifKAf7Jkg.JPEG.guseo109/KakaoTalk_20211124_162046912.jpg?type=f238", 
+    link: "https://blog.naver.com/PostView.naver?blogId=guseo109&logNo=222577617400&categoryNo=8&parentCategoryNo=&from=thumbnailList" 
+  },
+  { 
+    title: "울산 남구 달동 달동현대 아파트", 
+    tags: ["#달동현대아파트", "#아파트인테리어"], 
+    img: "https://postfiles.pstatic.net/MjAyMTExMjRfMzEg/MDAxNjM3NzQxMjE1MTM3._gIR0p6uW_N7ntWyQZhVHup7bMYmnwutk-KAbevuVwcg.TWL6Jeo5taITV5QXQFAWO1eS_60yAlyHBsI45C1habcg.JPEG.guseo109/KakaoTalk_20211124_162445692.jpg?type=f238", 
+    link: "https://blog.naver.com/PostView.naver?blogId=guseo109&logNo=222577534962&categoryNo=8&parentCategoryNo=&from=thumbnailList" 
+  },
+  { 
+    title: "울산 남구 옥동 성도아파트 인테리어", 
+    tags: ["#옥동성도아파트", "#울산인테리어"], 
+    img: "https://postfiles.pstatic.net/MjAyMTExMTFfMTMg/MDAxNjM2NjMxNTM5MDg3.8V4OZWsk2eYTPLRDxcmY5Z_fBS5pV0BZoDg-w-huJCcg.X_GH8HhEPM2f3x8ZCCjWWPxtf_kmqoSE4lDRxnixThIg.JPEG.guseo109/KakaoTalk_20211111_203608876_18.jpg?type=f238", 
+    link: "https://blog.naver.com/PostView.naver?blogId=guseo109&logNo=222565434255&categoryNo=8&parentCategoryNo=&from=thumbnailList" 
+  },
+  { 
+    title: "울산 이솝스터디카페 동부 패밀리점", 
+    tags: ["#이솝스터디카페", "#상공간인테리어"], 
+    img: "https://postfiles.pstatic.net/MjAyMTExMDFfNTAg/MDAxNjM1NzU0ODIwOTg1.KaV39-gbGliOUkFfT9s_kUwqwANJcbgwSjlqVXxQuf4g.GHDF6GkkGQlFhaz_8Gh9aR4gUDzHZdRUPK_t8EzeAtUg.JPEG.guseo109/KakaoTalk_20211028_160516794_20.jpg?type=f238", 
+    link: "https://blog.naver.com/PostView.naver?blogId=guseo109&logNo=222555395569&categoryNo=8&parentCategoryNo=&from=thumbnailList" 
+  },
+  { 
+    title: "울산 북구 화봉 화봉휴먼시아 아파트", 
+    tags: ["#화봉휴먼시아", "#울산인테리어"], 
+    img: "https://postfiles.pstatic.net/MjAyMTEwMjhfMTU2/MDAxNjM1NDA4MTQwNzMy.LcQJazMHsYuB-ibk9P9p9jC6VkHrZm8KLWkuOF8XZYYg.jflqLYd292C0EZSnvfPNoYg2u-hUe-Y_WOB-16wps-Ug.JPEG.guseo109/KakaoTalk_20211027_132111448_18.jpg?type=f238", 
+    link: "https://blog.naver.com/PostView.naver?blogId=guseo109&logNo=222551380654&categoryNo=8&parentCategoryNo=&from=thumbnailList" 
+  },
+  { 
+    title: "울산 앤드커피 상공간인테리어, 앤드커피 가맹 문의", 
+    tags: ["#앤드커피", "#상공간인테리어"], 
+    img: "https://postfiles.pstatic.net/MjAyMTA5MTdfMjYg/MDAxNjMxODYwNjI0NDU4.KybriMq4KW6xhS_ZWFonrjk1H5oA44H91CL2NnJLoxUg.XY1nYtHKjGIKAgh2LKc75oa1skcu5gs3nciRJ5uQnvIg.JPEG.guseo109/1631860623124.jpg?type=f238", 
+    link: "https://blog.naver.com/PostView.naver?blogId=guseo109&logNo=222509045022&categoryNo=8&parentCategoryNo=&from=thumbnailList" 
+  },
+  { 
+    title: "울산 중구 태화동 동부아파트 인테리어", 
+    tags: ["#태화동동부아파트", "#아파트인테리어"], 
+    img: "https://postfiles.pstatic.net/MjAyMDEwMTFfOTMg/MDAxNjAyMzk3NTY2MTE4.J9oRAU9EMNbnQtI80j6TvMAWy1F1hKnFDB3KCKj1tCsg.BkCfSBaf7EjMtZvnYB6U6iZkvwU9h_1F3HvwhLkN4fwg.JPEG.guseo109/1602397565633.jpg?type=f238", 
+    link: "https://blog.naver.com/PostView.naver?blogId=guseo109&logNo=222112580757&categoryNo=8&parentCategoryNo=&from=thumbnailList" 
+  },
+  { 
+    title: "해운대 재송동 센텀동부센트레빌 아파트", 
+    tags: ["#센텀동부센트레빌", "#해운대인테리어"], 
+    img: "https://postfiles.pstatic.net/MjAyMDA4MTZfMjM1/MDAxNTk3NTc5MTI4Nzk3.8KxBoGiUjBFjOlW1CgON_Cum7Awn4IPk3i79rS7qDnEg.dDS9vty4-ZY5EY95-PxGqlhU4tdca8riKVzyqqrOnH4g.JPEG.guseo109/1597579127770.jpg?type=f238", 
+    link: "https://blog.naver.com/PostView.naver?blogId=guseo109&logNo=222062364190&categoryNo=8&parentCategoryNo=&from=thumbnailList" 
+  },
+  { 
+    title: "울산 북구 신청동 한라신천지타운 리모델링", 
+    tags: ["#한라신천지타운", "#울산리모델링"], 
+    img: "https://postfiles.pstatic.net/MjAyMDA4MDVfMjQ4/MDAxNTk2NjMwNTc4MjEy.Cs_JRaYd8WbrWR6tok6r9kGIxvu95Cfws38NyBGKFQcg.k0SYj_xafltfFlz0jdXGJ2eeRCcbIDz3eSeRoGvxPlIg.JPEG.guseo109/1596630575268.jpg?type=f238", 
+    link: "https://blog.naver.com/PostView.naver?blogId=guseo109&logNo=222052270237&categoryNo=8&parentCategoryNo=&from=thumbnailList" 
+  },
+  { 
+    title: "울산 동구 전하동 전하푸르지오 아파트 인테리어", 
+    tags: ["#전하푸르지오", "#울산인테리어"], 
+    img: "https://postfiles.pstatic.net/MjAyMDA3MTlfMTU1/MDAxNTk1MTU4NzE0MjE5.678EhIDcfGkVcdkk8AciLb4ThuKvFRNkSoPWfWs17XYg.46G-udDOL5XMmHfVSclZgOuyCTe1Py73ni4nujYR36gg.JPEG.guseo109/1595158714146.jpg?type=f238", 
+    link: "https://blog.naver.com/PostView.naver?blogId=guseo109&logNo=222035487240&categoryNo=8&parentCategoryNo=&from=thumbnailList" 
+  }
+];
+
+const page8DataRaw = [
+  {
+    title: "동구 현대목재아파트 - 기초부터 탄탄한 방통공사 마감",
+    img: "https://postfiles.pstatic.net/MjAyMDAzMjhfMjcx/MDAxNTg1Mzg3OTE2NDUz.-TwuwColQ8RJ3hM_2ZdWpxY6OOedEWZrna5105Dayfog.RraqgyyFXD40KDdfC_BuElW0HxHXhIBvXqGBucD9vUAg.JPEG.guseo109/1585387916396.jpg?type=f238",
+    link: "https://blog.naver.com/PostView.naver?blogId=guseo109&logNo=221878047705&categoryNo=8&parentCategoryNo=&from=thumbnailList",
+    tags: ["#동구인테리어", "#현대목재아파트"]
+  },
+  {
+    title: "남구 삼산동 세양청구 - 공간의 품격을 높이는 인테리어",
+    img: "https://postfiles.pstatic.net/MjAyMDAyMjFfMjkg/MDAxNTgyMjg1NDcyMjc0.xnIg6vKwlv4Fyefr-qcZXqL4U85XP4_0EZoZle7jp1Ag.R7NP61mPypHL4_OAkGtHcYM-_iC7v8K1bXcx1_Cl2dwg.JPEG.guseo109/1582285470428.jpg?type=f238",
+    link: "https://blog.naver.com/PostView.naver?blogId=guseo109&logNo=221818788751&categoryNo=8&parentCategoryNo=&from=thumbnailList",
+    tags: ["#남구인테리어", "#삼산동세양청구"]
+  },
+  {
+    title: "남구 신정현대홈타운 - 수익률을 극대화하는 세입자 맞춤형 시공",
+    img: "https://postfiles.pstatic.net/MjAyMDAxMjFfMjkg/MDAxNTc5NjE1MDI1Nzc3.0mFx7-2_WA9N1ZSpZiyOA7CSCkO5l2i50XuDAIEOocIg.KsdT26AVoKQqi2wzjd6BvmojVsxUv98PhLxw_gzsp2Yg.JPEG.guseo109/1579615025337.jpg?type=f238",
+    link: "https://blog.naver.com/PostView.naver?blogId=guseo109&logNo=221780777919&categoryNo=8&parentCategoryNo=&from=thumbnailList",
+    tags: ["#신정현대홈타운", "#맞춤형시공"]
+  },
+  {
+    title: "동구 파라다이스 아파트 - 모던 라이프스타일 디자인",
+    img: "https://postfiles.pstatic.net/MjAyMDAxMDdfMjUy/MDAxNTc4MzY5NTQ1ODAz.8A2hdQ_czI1TA_AWVJOH8RpGZXlWD3zQ78yjX7k7y6kg.E17VYLX--PHjGkzdvn8KCdPDdMOlKpt9MMEcyjfr6pwg.JPEG.guseo109/1578369544288.jpg?type=f238",
+    link: "https://blog.naver.com/PostView.naver?blogId=guseo109&logNo=221762779726&categoryNo=8&parentCategoryNo=&from=thumbnailList",
+    tags: ["#동구파라다이스", "#모던라이프"]
+  },
+  {
+    title: "언양 근훈하이츠 - 웨인스코팅으로 완성한 클래식 무드",
+    img: "https://postfiles.pstatic.net/MjAxOTEyMTJfMSAg/MDAxNTc2MTQ5NDYyMTg1.sllY9xctqgPTfSMrnMVypK_EiQ1bMiw99WI3yvNNDkUg.RKpCD6W54hL5ZnvdJwGFJ8yFbVwoNzHvRu6z8yQJLjAg.JPEG.guseo109/1576149459803.jpg?type=f238",
+    link: "https://blog.naver.com/PostView.naver?blogId=guseo109&logNo=221735336899&categoryNo=8&parentCategoryNo=&from=thumbnailList",
+    tags: ["#언양근훈하이츠", "#웨인스코팅"]
+  },
+  {
+    title: "삼산동 상가 - 고객의 발길을 이끄는 트렌디 상업 공간",
+    img: "https://postfiles.pstatic.net/MjAxOTExMjJfMTk2/MDAxNTc0NDAzNjY1NjQx.MDE2wataR1GOztDnP8yWuCVk1ArZI5vq8-sfv4wO_WYg.8E_M7P0a6j989bD0eUeJ-9Es5Z6abKTxLThmJUBP0ccg.JPEG.guseo109/1574403662806.jpg?type=f238",
+    link: "https://blog.naver.com/PostView.naver?blogId=guseo109&logNo=221715302998&categoryNo=8&parentCategoryNo=&from=thumbnailList",
+    tags: ["#삼산동상가", "#상업공간인테리어"]
+  },
+  {
+    title: "미니멀리즘을 강조한 공간 활용, 욕실 매립형 샤워기 시공",
+    img: "https://postfiles.pstatic.net/MjAxOTExMTRfMjgy/MDAxNTczNjkyNDQ4Mjcy.hHXft7vTLERNsuEpg1mFWJgTNaPzJefGoax277Ivwjgg.-_MlkCGvPC3XiHLFcDFecKm8vf8P6zzyYm7fNNNKCS4g.JPEG.guseo109/1573692446161.jpg?type=f238",
+    link: "https://blog.naver.com/PostView.naver?blogId=guseo109&logNo=221707794962&categoryNo=8&parentCategoryNo=&from=thumbnailList",
+    tags: ["#미니멀리즘", "#욕실인테리어"]
+  },
+  {
+    title: "동구 금강아파트 - 생활의 편의를 더한 스마트 리모델링",
+    img: "https://postfiles.pstatic.net/MjAxOTExMTJfMTU2/MDAxNTczNTUzMzI3OTg5.lvOM5O--975bsnzvN-bKggOqrIi3TH5LWdgzBMJMrvUg.jtB7kd_BFChTUyL3r4VL0kLUv0xAZd0Ar5HEAAxTVPwg.JPEG.guseo109/1573553326732.jpg?type=f238",
+    link: "https://blog.naver.com/PostView.naver?blogId=guseo109&logNo=221705746038&categoryNo=8&parentCategoryNo=&from=thumbnailList",
+    tags: ["#동구금강아파트", "#스마트리모델링"]
+  },
+  {
+    title: "옥동 한진전원아파트 - 자연과 조화로운 힐링 주거공간",
+    img: "https://postfiles.pstatic.net/MjAxOTEwMjVfMTgy/MDAxNTcyMDAwOTQ4ODcx.vevfV_o-Dyrr6EPNYbOcHpADkHJg3ZntAPSc4QLQksgg.CEGeihNhPm9qPvnzAcBVW-Ler9x_qgzrRdQa_XJ6Wdgg.JPEG.guseo109/1572000946659.jpg?type=f238",
+    link: "https://blog.naver.com/PostView.naver?blogId=guseo109&logNo=221688671847&categoryNo=8&parentCategoryNo=&from=thumbnailList",
+    tags: ["#옥동한진전원", "#힐링공간"]
+  },
+  {
+    title: "동구 파라다이스 아파트 - 디테일이 살아있는 프리미엄 시공",
+    img: "https://postfiles.pstatic.net/MjAxOTEwMjJfMTg0/MDAxNTcxNzQyMDc3NDI1.8B9U6hiNseVmJlA8Z3DY1f_J-8uFhPMM4D2JNMjXeOMg.wZYs1qjNihc2X7M9F73NIQgjHfX_-GY4wsUtYe6Ryccg.JPEG.guseo109/1571742073590.jpg?type=f238",
+    link: "https://blog.naver.com/PostView.naver?blogId=guseo109&logNo=221685545775&categoryNo=8&parentCategoryNo=&from=thumbnailList",
+    tags: ["#동구파라다이스", "#프리미엄시공"]
+  },
+  {
+    title: "구영리 푸르지오 - 하이엔드 주거 공간의 재탄생",
+    img: "https://postfiles.pstatic.net/MjAxOTEwMTJfMTk3/MDAxNTcwODgwOTk3MjY0.uBJCQLdDLlmrB6sNJCDMDBtKvBWNebknqLvHZ_nyMagg.uc3DenoVvgC-xGhYUWMwB5V0u5uN0O4LcrXV5fF7swgg.JPEG.guseo109/1570880995473.jpg?type=f238",
+    link: "https://blog.naver.com/PostView.naver?blogId=guseo109&logNo=221675869731&categoryNo=8&parentCategoryNo=&from=thumbnailList",
+    tags: ["#구영리푸르지오", "#하이엔드인테리어"]
+  },
+  {
+    title: "완벽한 문제 해결, 정확한 누수 탐지 및 복구 솔루션",
+    img: "https://postfiles.pstatic.net/MjAxOTA5MjVfMTE2/MDAxNTY5NDA5MDUwMTMy.vohX6OZ0_hJeFvpiW8PttRScJuXDQnIvEh8nJy0LUm4g.Wj2vs11tPZEshArgQtOyPNvevaouWxNnhLlRVQtTFLwg.JPEG.guseo109/20190925_102322.jpg?type=f238",
+    link: "https://blog.naver.com/PostView.naver?blogId=guseo109&logNo=221659281580&categoryNo=8&parentCategoryNo=&from=thumbnailList",
+    tags: ["#누수탐지", "#복구솔루션"]
+  },
+  {
+    title: "안전하고 내구성을 극대화한 설비 동관 용접 기술",
+    img: "https://phinf.pstatic.net/image.nmv/blog_2019_09_24_2996/63ab43fa-dec6-11e9-b30d-505dacfba98a_01.jpg?type=f238x238",
+    link: "https://blog.naver.com/PostView.naver?blogId=guseo109&logNo=221658298096&categoryNo=8&parentCategoryNo=&from=thumbnailList",
+    tags: ["#설비공사", "#동관용접"]
+  },
+  {
+    title: "동구 대송현대 아파트 - 트렌디한 감각의 전면 리모델링",
+    img: "https://postfiles.pstatic.net/MjAxOTA5MjFfMjk5/MDAxNTY5MDcyNzk3MzA2.xoMgOWSYntNwUhxYHrfQ-qJjtJjmanNK26vutehkSZEg.CZLhYuFqetKzwLGC6YHHV74C6Qq69N4_YCUmYr-3ny4g.JPEG.guseo109/1567397229149.jpg?type=f238",
+    link: "https://blog.naver.com/PostView.naver?blogId=guseo109&logNo=221655286792&categoryNo=8&parentCategoryNo=&from=thumbnailList",
+    tags: ["#대송현대아파트", "#전면리모델링"]
+  },
+  {
+    title: "남구 야음동 남운진주아파트 - 실용성과 심미성의 완벽한 밸런스",
+    img: "https://postfiles.pstatic.net/MjAxOTA5MTFfMTIw/MDAxNTY4MTc4NjYxOTE5.QQ7QFNE4CN1S3RyA4c8jBFZtrDRJQKpDZcL_aLbVgt8g.9ibX5nJuzDxHffW8RTaVoB8ebGkyMQ7ecZYRSVZYKHEg.JPEG.guseo109/20190722_085627.jpg?type=f238",
+    link: "https://blog.naver.com/PostView.naver?blogId=guseo109&logNo=221645679431&categoryNo=8&parentCategoryNo=&from=thumbnailList",
+    tags: ["#남운진주아파트", "#실용적인테리어"]
+  },
+  {
+    title: "남구 야음동 쌍용스윗닷홈 - 품격을 더하는 맞춤형 공간 디자인",
+    img: "https://postfiles.pstatic.net/MjAxOTA4MzBfMjU2/MDAxNTY3MTUyMDM5Njk4.VnO4MQKPgYTky1hJgA9et5LaQawhFcHD1twxMYKPZTcg.Q12V2d8SAkcH9Q2OnRmet3G4QAsHmE7ypVA-dQKsTt0g.JPEG.guseo109/20190825_145434.jpg?type=f238",
+    link: "https://blog.naver.com/PostView.naver?blogId=guseo109&logNo=221633607148&categoryNo=8&parentCategoryNo=&from=thumbnailList",
+    tags: ["#쌍용스윗닷홈", "#맞춤형디자인"]
+  }
+];
+
+const page9DataRaw = [
+  { 
+    title: "울산 인테리어, 달동 삼성 아파트 인테리어, 리모델링", 
+    tags: ["#달동삼성아파트", "#아파트리모델링"], 
+    img: "https://postfiles.pstatic.net/MjAxOTA4MTFfMjcw/MDAxNTY1NTIwMTkyMzg3.mlNUACVxrFZ6Rsw5zimXgwYAdTjCitxNVmgaBCDyTEMg.ALfdHcKlpCHRtq_I6N4V0sfz6KCi-znyfL3gxOqYpvcg.JPEG.guseo109/20190810_144435.jpg?type=f238", 
+    link: "https://blog.naver.com/PostView.naver?blogId=guseo109&logNo=221613072187&categoryNo=8&parentCategoryNo=&from=thumbnailList" 
+  },
+  { 
+    title: "울산 인테리어, 동구 대송 현대 인테리어", 
+    tags: ["#대송현대아파트", "#울산인테리어"], 
+    img: "https://postfiles.pstatic.net/MjAxOTA4MDFfMTAz/MDAxNTY0NjI3NjQ1MDI0.xg-xFr5XCmBa_y7GUZZEn3VOMTlDBGkGlfX8Wqd1KoYg.GvYtbtSMvx6IAz6405RG0x8_PJN81Jt5KAJuZOH9d30g.JPEG.guseo109/1564625431979_Signature.jpg?type=f238", 
+    link: "https://blog.naver.com/PostView.naver?blogId=guseo109&logNo=221602001845&categoryNo=8&parentCategoryNo=&from=thumbnailList" 
+  },
+  { 
+    title: "울산 인테리어, 울산 동구 서부 서원쌍떼빌 아파트 리모델링, 서부 아파트", 
+    tags: ["#서원쌍떼빌", "#아파트리모델링"], 
+    img: "https://postfiles.pstatic.net/MjAxOTA3MjBfMjYz/MDAxNTYzNjAwNzAzNTg4.7l6sE20nAzLlOZ2jbqFdlny-IUyijZBp8_uSpTNgnsAg.djnMfbLHW5Zfs8HK8oLNawBjdFRKurKFkeUwRga8Onsg.JPEG.guseo109/20190720_141324.jpg?type=f238", 
+    link: "https://blog.naver.com/PostView.naver?blogId=guseo109&logNo=221590639688&categoryNo=8&parentCategoryNo=&from=thumbnailList" 
+  },
+  { 
+    title: "울산 인테리어 학원 (수강생 모집 ~아파트 한채 혼자서 인테리어 할 수 있도록 교육합니다~", 
+    tags: ["#인테리어학원", "#인테리어교육"], 
+    img: "https://postfiles.pstatic.net/MjAxOTA3MThfMTIw/MDAxNTYzNDU4MjczNzYz.w-aUAHlPNCO0kexCChzCnLmcSwdfeFrKbsWwXJh6WUYg.JSvE8T0zxx-qp1zljnHX0hE6L8Al7TcmykravEWPVlQg.JPEG.guseo109/20190313_193815.jpg?type=f238", 
+    link: "https://blog.naver.com/PostView.naver?blogId=guseo109&logNo=221589329407&categoryNo=8&parentCategoryNo=&from=thumbnailList" 
+  },
+  { 
+    title: "울산 인테리어 남구 옥동 대륙현대 인테리어, 리모델링", 
+    tags: ["#옥동대륙현대", "#울산인테리어"], 
+    img: "https://postfiles.pstatic.net/MjAxOTA3MDlfMjAy/MDAxNTYyNjUyMzE2MDgy.FUvWWX8le9t6xQiD4seugRrLV-WV2nOEYlSxT0cOvJ0g._t9g5y-5FTe38K3ca3678nEuDGDtNsgvxzLZhnOgnPIg.JPEG.guseo109/20190624_120548.jpg?type=f238", 
+    link: "https://blog.naver.com/PostView.naver?blogId=guseo109&logNo=221582446937&categoryNo=8&parentCategoryNo=&from=thumbnailList" 
+  },
+  { 
+    title: "울산 인테리어, 북구 그린카운티 리모델링", 
+    tags: ["#그린카운티", "#울산리모델링"], 
+    img: "https://postfiles.pstatic.net/MjAxOTA2MjZfNTEg/MDAxNTYxNTU0NDU3OTQy.U6QBruJjUe3fKKXf9PKx2MkGnUvmtrr-W15zc3nqwyQg.G2dvs8LmnrS1B7xqyzAzqq0MusVFbj_CVmZo1uIyCPog.JPEG.guseo109/20190607_112307.jpg?type=f238", 
+    link: "https://blog.naver.com/PostView.naver?blogId=guseo109&logNo=221571558971&categoryNo=8&parentCategoryNo=&from=thumbnailList" 
+  },
+  { 
+    title: "울산 인테리어, 동구 서부 아파트 인테리어", 
+    tags: ["#서부아파트", "#아파트인테리어"], 
+    img: "https://postfiles.pstatic.net/MjAxOTA2MTJfMTYg/MDAxNTYwMzM1NzQ1Njk1.XoYF4OBqvOOk41yWgQkJi5xx-x_1x-3g6B4gonit_H8g.XAf3fXPEqwN4IvdyEo9GY5asT8kKc4LMtjj4pf7J1F8g.JPEG.guseo109/20190604_154634.jpg?type=f238", 
+    link: "https://blog.naver.com/PostView.naver?blogId=guseo109&logNo=221560586625&categoryNo=8&parentCategoryNo=&from=thumbnailList" 
+  },
+  { 
+    title: "울산 인테리어, 북구 달천 그린카운티 인테리어", 
+    tags: ["#달천그린카운티", "#울산인테리어"], 
+    img: "https://postfiles.pstatic.net/MjAxOTA2MDVfNDMg/MDAxNTU5NzI0OTIxMjg1.ygfxgYwh4R-WEhR4hyq9_p9nY-CqIvmTmTIbSKSECusg.NofbsIE6rBjb260GMDAyPDqMN8TJkuexUMWSHjaS0XMg.JPEG.guseo109/20190330_183739.jpg?type=f238", 
+    link: "https://blog.naver.com/PostView.naver?blogId=guseo109&logNo=221555220471&categoryNo=8&parentCategoryNo=&from=thumbnailList" 
+  },
+  { 
+    title: "울산 인테리어, 중구 레미안 인테리어", 
+    tags: ["#중구레미안", "#아파트인테리어"], 
+    img: "https://postfiles.pstatic.net/MjAxOTA1MjNfMjI2/MDAxNTU4NjE1ODg3ODky.IPm24DQz-UujSB3eM-5ircoc5lOaMndQAQoaEJefbR0g.AIsXy6swO1PbyeH_NXcUwb8ASsWOu1f0DiVY8ZkcV8Mg.JPEG.guseo109/20190219_130524.jpg?type=f238", 
+    link: "https://blog.naver.com/PostView.naver?blogId=guseo109&logNo=221545042672&categoryNo=8&parentCategoryNo=&from=thumbnailList" 
+  },
+  { 
+    title: "울산 인테리어, 동구 상림시드니 아파트 올리모델링(인테리어)", 
+    tags: ["#상림시드니아파트", "#올리모델링"], 
+    img: "https://postfiles.pstatic.net/MjAxOTA1MjFfMTIz/MDAxNTU4NDM1MjM0NDIw.8t-36Z8RE_oIMtf2fkw1vJJuxhtQObVWCPUrW8TpF3kg.5u8UVdiIKGns7qFJRl_el5bllRECM9YWE96QwG3MX3wg.JPEG.guseo109/20190521_144757.jpg?type=f238", 
+    link: "https://blog.naver.com/PostView.naver?blogId=guseo109&logNo=221543199793&categoryNo=8&parentCategoryNo=&from=thumbnailList" 
+  },
+  { 
+    title: "울산 인테리어, 동구 방어동 현대비치 아파트", 
+    tags: ["#현대비치아파트", "#울산인테리어"], 
+    img: "https://postfiles.pstatic.net/MjAxOTA0MjdfMjg1/MDAxNTU2MzU0MzM5MDE1.qIPceQHR-YiH4lyzcL9mkxTdw5AgD0YeQ9Bib-DlPEQg.bUQGoLgzfiOqLIIaDeMMlic7gG09cNw3t-K4M71ntzsg.JPEG.guseo109/20190424_173639.jpg?type=f238", 
+    link: "https://blog.naver.com/PostView.naver?blogId=guseo109&logNo=221524024320&categoryNo=8&parentCategoryNo=&from=thumbnailList" 
+  },
+  { 
+    title: "울산 인테리어, 동구 상가주택", 
+    tags: ["#상가주택인테리어", "#울산인테리어"], 
+    img: "https://postfiles.pstatic.net/MjAxOTA0MjdfMTk1/MDAxNTU2MzUzMTI2MjAw.bsn0ehPxEcQCqHUssF_ieXZEVNajaHb-9jHYqeOcsf4g.uU675s_1AxKi533fGtz7YH-C42t99K6CcFkUlmCVYZog.JPEG.guseo109/20190402_101645.jpg?type=f238", 
+    link: "https://blog.naver.com/PostView.naver?blogId=guseo109&logNo=221524007903&categoryNo=8&parentCategoryNo=&from=thumbnailList" 
+  },
+  { 
+    title: "임대 주택 최초 임대료 기준 해명 자료", 
+    tags: ["#임대주택정보", "#부동산자료"], 
+    img: "https://postfiles.pstatic.net/MjAxOTA0MTBfMTgg/MDAxNTU0ODgyMDUwNTE4.NpydlkkjcvHgvdeqF47HO6naKMIEVS5jx96w4X14AZUg.ReItfB6HA1UiupP35Q4bfdNTSgR23tBmc_qLcsm2AAIg.JPEG.guseo109/BandPhoto_2019_04_10_14_33_00.jpg?type=f238", 
+    link: "https://blog.naver.com/PostView.naver?blogId=guseo109&logNo=221510336888&categoryNo=8&parentCategoryNo=&from=thumbnailList" 
+  },
+  { 
+    title: "울산 인테리어, 남구 무거동 상가주택 60평 올리모델링", 
+    tags: ["#무거동상가주택", "#상가주택리모델링"], 
+    img: "https://postfiles.pstatic.net/MjAxOTA0MDlfMjk1/MDAxNTU0ODEzNTg2OTc3.nx_THdK8rqRprPq6Xd7KstLfIRf1z6BgSvMBsxW4BfYg.xQxabZigxxVxF_1qw6enQ3nPoEagSL7hrRs14wMUqBUg.JPEG.guseo109/20190318_134520.jpg?type=f238", 
+    link: "https://blog.naver.com/PostView.naver?blogId=guseo109&logNo=221509677775&categoryNo=8&parentCategoryNo=&from=thumbnailList" 
+  },
+  { 
+    title: "울산 인테리어 남구 신정동 상가주택", 
+    tags: ["#신정동상가주택", "#상가주택인테리어"], 
+    img: "https://postfiles.pstatic.net/MjAxOTAzMjdfMzIg/MDAxNTUzNjc0MjYyNzI2.J5wWIE47TvDwYHYPL4KLSWDZYy953zsVI3rdWXUW5WUg.NOWJ4GrgPi63lJk1Q-Wxt_fzTBcRsCuXgB-93V0QBwQg.JPEG.guseo109/20190308_112358_HDR.jpg?type=f238", 
+    link: "https://blog.naver.com/PostView.naver?blogId=guseo109&logNo=221498811201&categoryNo=8&parentCategoryNo=&from=thumbnailList" 
+  },
+  { 
+    title: "울산 인테리어, 야음동 한라전원 아파트", 
+    tags: ["#야음동한라전원", "#아파트인테리어"], 
+    img: "https://postfiles.pstatic.net/MjAxOTAzMjdfMTY5/MDAxNTUzNjczNzE1NjQ2.vm2elQrLM37F-S1M-1Ac_nq_CNzs-DnhPHSrfJpj4yMg.J5XR_XsZcCVAJP9qPwPFpbCRNuMPK7kWF6sCHC6BLk4g.JPEG.guseo109/20190307_104543.jpg?type=f238", 
+    link: "https://blog.naver.com/PostView.naver?blogId=guseo109&logNo=221498802103&categoryNo=8&parentCategoryNo=&from=thumbnailList" 
+  }
+];
+
+const page10DataRaw = [
+  { 
+    title: "울산북구 호계상가인테리어(청참치)", 
+    tags: ["#호계상가인테리어", "#상공간인테리어"], 
+    img: "https://postfiles.pstatic.net/MjAxOTAzMTNfMTAz/MDAxNTUyNDg1MDM0MjU5.b6qFVCBJ6yy1boMTltIkIgPAovh-7N4DpRHf3poaH-og.Taun5yvJNgT3rpSH9l5nuK9enfLZjEzkGM36zaCysp0g.JPEG.guseo109/20190302_110955.jpg?type=f238", 
+    link: "https://blog.naver.com/PostView.naver?blogId=guseo109&logNo=221487627824&categoryNo=8&parentCategoryNo=&from=thumbnailList" 
+  },
+  { 
+    title: "상가 원상 복귀", 
+    tags: ["#상가원상복구", "#상가철거"], 
+    img: "https://postfiles.pstatic.net/MjAxOTAxMzFfMTMz/MDAxNTQ4OTM2MTA5Nzkx.TCMH8G2xmJj4TRTdgmcE1PTxoePSWoVyBaSJ_1uxXtgg.ipoTMvDPIJEeVj6z64Ue88eP-ixeomfzlKJBfdOQWgUg.JPEG.guseo109/20190123_085514.jpg?type=f238", 
+    link: "https://blog.naver.com/PostView.naver?blogId=guseo109&logNo=221455909458&categoryNo=8&parentCategoryNo=&from=thumbnailList" 
+  },
+  { 
+    title: "울산 북구 호계수자인 사무실 인테리어", 
+    tags: ["#호계수자인", "#사무실인테리어"], 
+    img: "https://postfiles.pstatic.net/MjAxOTAxMzFfMTQ1/MDAxNTQ4OTE1MTY2Mjcz.FM1llu5IEKZNJAlmldws-fhXzo07K7eD3zWK31BMMAog.L0szX5ZN7NFPXq_G5DesOnTjz6t-cp-Pna9UGM9TqKog.JPEG.guseo109/20190128_141324.jpg?type=f238", 
+    link: "https://blog.naver.com/PostView.naver?blogId=guseo109&logNo=221455625693&categoryNo=8&parentCategoryNo=&from=thumbnailList" 
+  },
+  { 
+    title: "울산 동구 우경아트빌라", 
+    tags: ["#우경아트빌라", "#빌라인테리어"], 
+    img: "https://postfiles.pstatic.net/MjAxOTAxMjFfODkg/MDAxNTQ4MDUwNDg5NTUw.SKUA4XoCafVKC94KdO7YR5o9jNSBVfvT8Zs6dAApXx4g.Gv0uJLoe0ib6v93nPX2mIY1uv25wLGKpnizJl2LcmU4g.JPEG.guseo109/20190121_131205.jpg?type=f238", 
+    link: "https://blog.naver.com/PostView.naver?blogId=guseo109&logNo=221447340767&categoryNo=8&parentCategoryNo=&from=thumbnailList" 
+  },
+  { 
+    title: "엑셀 파이프 연결방법", 
+    tags: ["#인테리어실무", "#엑셀파이프"], 
+    img: "https://postfiles.pstatic.net/MjAxOTAxMTFfMTU0/MDAxNTQ3MTc5MzE4OTM4.NuKGBYeAFSNd5SuIfE_KIHSNIQAB0eH2mLpaysJUvOMg.5BAoDbfWfg19QS3JbTp4WaTrUEEDklXC4VARUH2ouVQg.JPEG.guseo109/20190111_120251.jpg?type=f238", 
+    link: "https://blog.naver.com/PostView.naver?blogId=guseo109&logNo=221439517295&categoryNo=8&parentCategoryNo=&from=thumbnailList" 
+  },
+  { 
+    title: "부산 사하구 다대동 삼환 아파트 인테리어", 
+    tags: ["#다대동삼환아파트", "#부산인테리어"], 
+    img: "https://postfiles.pstatic.net/MjAxOTAxMTBfMTky/MDAxNTQ3MTI0NzI4NTgz.0feSIBjceni_vDPjWjfDqcRUriAFJU4FpJoJzzokbwIg.IqXbR8sSzA1hQ1ExoSbTw4aMt2J_rXxateMnR65qULEg.JPEG.guseo109/20190110_163739.jpg?type=f238", 
+    link: "https://blog.naver.com/PostView.naver?blogId=guseo109&logNo=221439102195&categoryNo=8&parentCategoryNo=&from=thumbnailList" 
+  },
+  { 
+    title: "울산 북구 호계 협성 노블리스 인테리어", 
+    tags: ["#협성노블리스", "#아파트인테리어"], 
+    img: "https://postfiles.pstatic.net/MjAxODEyMTVfMTgw/MDAxNTQ0ODc0NDA1NjE5.IxqrB4KwoEOCjWQmuIelh8ycUCvxu2IaQFkRIhSbj70g.ff2JaRcYwnQsWnUuhMBb-NS8A76H60wVmpXefrzxfc8g.JPEG.guseo109/20181128_104441.jpg?type=f238", 
+    link: "https://blog.naver.com/PostView.naver?blogId=guseo109&logNo=221419951558&categoryNo=8&parentCategoryNo=&from=thumbnailList" 
+  },
+  { 
+    title: "북구 협성 노블레스 중문 가벽 세우기", 
+    tags: ["#중문가벽", "#인테리어시공"], 
+    img: "https://postfiles.pstatic.net/MjAxODEyMTFfOTAg/MDAxNTQ0NDg5MTA1ODY0.ZVRoqot4IFWm0GyykkTFHLy3fIrrpRMMx9jzm4V7KgYg.89GcDt_zt3iODDmAROrvN87N2onTBgxX_jAw_67A7KUg.JPEG.guseo109/20181204_092553.jpg?type=f238", 
+    link: "https://blog.naver.com/PostView.naver?blogId=guseo109&logNo=221416727615&categoryNo=8&parentCategoryNo=&from=thumbnailList" 
+  },
+  { 
+    title: "울산 동구 대송 현대 부분 인테리어", 
+    tags: ["#대송현대아파트", "#부분인테리어"], 
+    img: "https://postfiles.pstatic.net/MjAxODExMjdfNCAg/MDAxNTQzMzE0NzgwMDYx.wxoaTgiih-RVuni8VEC9TD4Mhy6IYy3BP_W5N-3yS14g.oLrnCWrgOsZDgWjJ4ZJ37Xktf784Q6cQNde1E01t9ckg.JPEG.guseo109/20181119_115421_HDR.jpg?type=f238", 
+    link: "https://blog.naver.com/PostView.naver?blogId=guseo109&logNo=221407444952&categoryNo=8&parentCategoryNo=&from=thumbnailList" 
+  },
+  { 
+    title: "울산 동구 주텍 올리모델링", 
+    tags: ["#주택올리모델링", "#단독주택인테리어"], 
+    img: "https://postfiles.pstatic.net/MjAxODExMTlfMjQ4/MDAxNTQyNjE5NDk2MTAz.l5w2F4ZGyRhUUJbgSHK6XkpB1U5WiImW09n3x63VIl0g.YogEQbqMdUjrUyyTUtOfhkShX6ch-67vUUMu6sb7y8Qg.JPEG.guseo109/20181102_133535_HDR.jpg?type=f238", 
+    link: "https://blog.naver.com/PostView.naver?blogId=guseo109&logNo=221401835168&categoryNo=8&parentCategoryNo=&from=thumbnailList" 
+  },
+  { 
+    title: "주택 다락방 창문 만들기", 
+    tags: ["#다락방인테리어", "#창문시공"], 
+    img: "https://postfiles.pstatic.net/MjAxODExMTRfMjI4/MDAxNTQyMjAzMjQ2NzI2.GIxt8IjdEn8Xl0bRHt-b2ACfqkhhlN1qqMaVS6UgIQcg.Jaashu2vlHCBC6mRUoKTTPRaWA__lQ7fPoRdC6gHWkwg.JPEG.guseo109/20181103_092403.jpg?type=f238", 
+    link: "https://blog.naver.com/PostView.naver?blogId=guseo109&logNo=221398635699&categoryNo=8&parentCategoryNo=&from=thumbnailList" 
+  },
+  { 
+    title: "울산 동구 대송동 주택 올리모델링", 
+    tags: ["#대송동주택", "#주택올리모델링"], 
+    img: "https://postfiles.pstatic.net/MjAxODExMDlfMjMy/MDAxNTQxNzY0NzQwMzkz.gREuL_2Hhd6GIie_xH6B4GA4NQVlzJDGjrhVdYzLTPAg.K30_KrDWH0btvkLFM0pm7H2t2s5mtS3IfQ4HLwiLenUg.JPEG.guseo109/20181017_110430_HDR.jpg?type=f238", 
+    link: "https://blog.naver.com/PostView.naver?blogId=guseo109&logNo=221396371797&categoryNo=8&parentCategoryNo=&from=thumbnailList" 
+  },
+  { 
+    title: "울산 인테리어 무거동 옥현 주공", 
+    tags: ["#옥현주공아파트", "#무거동인테리어"], 
+    img: "https://postfiles.pstatic.net/MjAxODEwMTlfMjEw/MDAxNTM5OTMyNDcwMDA4.liDzj0xRS9W7fuqOhhJr-mYw_9NVxNXRRis7KE6OuUIg.GMaDghAAgQykag6SQGC9-Fn_2dAPHTu1y6FuTx0kE68g.JPEG.guseo109/20181019_111325_HDR.jpg?type=f238", 
+    link: "https://blog.naver.com/PostView.naver?blogId=guseo109&logNo=221395306140&categoryNo=8&parentCategoryNo=&from=thumbnailList" 
+  },
+  { 
+    title: "울산 인테리어 베란다 확장 공사", 
+    tags: ["#베란다확장", "#아파트인테리어"], 
+    img: "https://postfiles.pstatic.net/MjAxODEwMTFfMjU0/MDAxNTM5MjUwMTg5ODM0.Y_FzoeKuYh6N24Zt_AQWqVPd_AgRxURIbTwPOScUaCAg.gvq9Bp2sYobzR7-HwtybbLe_YNlcqqVrTHOmlgjcI8og.JPEG.guseo109/20181009_172901.jpg?type=f238", 
+    link: "https://blog.naver.com/PostView.naver?blogId=guseo109&logNo=221380886746&categoryNo=8&parentCategoryNo=&from=thumbnailList" 
+  },
+  { 
+    title: "신동 아이파크 올리모델링", 
+    tags: ["#신동아이파크", "#올리모델링"], 
+    img: "https://postfiles.pstatic.net/MjAxODEwMDlfMzIg/MDAxNTM5MDcwODQ4OTk2.FzG-F1bGz33EJYPBkm-wI2j-V8rY6Du8keMLPAh5-W8g.rFUl4j5BBrqw1gJ37umqx9aLm1EZV3luTuWzLJhZeiAg.JPEG.guseo109/20180917_154620.jpg?type=f238", 
+    link: "https://blog.naver.com/PostView.naver?blogId=guseo109&logNo=221375602479&categoryNo=8&parentCategoryNo=&from=thumbnailList" 
+  },
+  { 
+    title: "울산 인테리어 동구 서부 아파트", 
+    tags: ["#서부아파트", "#울산인테리어"], 
+    img: "https://postfiles.pstatic.net/MjAxODEwMDlfMzIg/MDAxNTM5MDcwODQ4OTk2.FzG-F1bGz33EJYPBkm-wI2j-V8rY6Du8keMLPAh5-W8g.rFUl4j5BBrqw1gJ37umqx9aLm1EZV3luTuWzLJhZeiAg.JPEG.guseo109/20180917_154620.jpg?type=f238", 
+    link: "https://blog.naver.com/PostView.naver?blogId=guseo109&logNo=221374083035&categoryNo=8&parentCategoryNo=&from=thumbnailList" 
+  }
+];
+
+const page11DataRaw = [
+  { 
+    title: "여수 인테리어", 
+    tags: ["#여수인테리어", "#인테리어시공"], 
+    img: "https://postfiles.pstatic.net/MjAxODA5MjBfMjc1/MDAxNTM3NDQ3NzY1NTIw.qUvkSz9v8mKj38zZthYxDpk37RspmqA_pYGSYWjW-NEg.MN7mmc3WmaApac-nbS0Sny2GQoGTanch-Z0aKetk_98g.JPEG.guseo109/20180916_172113.jpg?type=f238", 
+    link: "https://blog.naver.com/PostView.naver?blogId=guseo109&logNo=221363052359&categoryNo=8&parentCategoryNo=&from=thumbnailList" 
+  },
+  { 
+    title: "화장실 방수", 
+    tags: ["#화장실방수", "#욕실인테리어"], 
+    img: "https://postfiles.pstatic.net/MjAxODA5MTdfODkg/MDAxNTM3MTUwODkzNzc2.qi8ZS1n-k_1E2lQ6fn03B4iU1FqYXWucgDtaD2BLeJkg.xhYN4rty7PXIecyNJSa2MaGYU5DIIOXcvqQlXbkjNbgg.JPEG.guseo109/20180906_082846_HDR.jpg?type=f238", 
+    link: "https://blog.naver.com/PostView.naver?blogId=guseo109&logNo=221360500998&categoryNo=8&parentCategoryNo=&from=thumbnailList" 
+  },
+  { 
+    title: "부산 남구 용호동 메트로시티", 
+    tags: ["#용호동메트로시티", "#부산인테리어"], 
+    img: "https://postfiles.pstatic.net/MjAxODA4MjRfNjkg/MDAxNTM1MTE3NTc0NDUw.QI2UcPkvPc9uuCxAryyQSGuBeeqgpeoIlSn81yhewO8g.RvI8VHCrWY5fuPtJmMbWNdLzqux4POhJ51AQQ1x53IMg.JPEG.guseo109/20180824_162205.jpg?type=f238", 
+    link: "https://blog.naver.com/PostView.naver?blogId=guseo109&logNo=221345477407&categoryNo=8&parentCategoryNo=&from=thumbnailList" 
+  },
+  { 
+    title: "쿨루프 성남빌라 시공", 
+    tags: ["#쿨루프시공", "#빌라인테리어"], 
+    img: "https://images.unsplash.com/photo-1513694203232-719a280e022f?q=80&w=2069&auto=format&fit=crop", 
+    link: "https://blog.naver.com/PostView.naver?blogId=guseo109&logNo=221343603842&categoryNo=8&parentCategoryNo=&from=thumbnailList" 
+  },
+  { 
+    title: "방수 공사 종류", 
+    tags: ["#방수공사", "#인테리어정보"], 
+    img: "https://images.unsplash.com/photo-1589939705384-5185137a7f0f?q=80&w=2070&auto=format&fit=crop", 
+    link: "https://blog.naver.com/PostView.naver?blogId=guseo109&logNo=221343594415&categoryNo=8&parentCategoryNo=&from=thumbnailList" 
+  },
+  { 
+    title: "울산 북구 매곡 현대 아파트", 
+    tags: ["#매곡현대아파트", "#울산인테리어"], 
+    img: "https://postfiles.pstatic.net/MjAxODA4MjFfMTIw/MDAxNTM0ODQ5MjY2MDYz.gKoIYpmD54kOhpVBiBeX_wdEtiZR72yXRn3Q38WaWbsg.tcVKRGjaPdIuf7068P7f9T7Bej0YTecAvlINm4e-O4gg.JPEG.guseo109/20180821_123212.jpg?type=f238", 
+    link: "https://blog.naver.com/PostView.naver?blogId=guseo109&logNo=221343261314&categoryNo=8&parentCategoryNo=&from=thumbnailList" 
+  },
+  { 
+    title: "경제적 자유 강의", 
+    tags: ["#경제적자유", "#자기계발"], 
+    img: "https://postfiles.pstatic.net/MjAxODA4MjFfOTAg/MDAxNTM0ODIyMTgyNjg2.AqmiaxUcg8mW2nzyPXZbIN1fM1cTKtfRyGTJQ7KdTQMg.kSV5coo5SOx0LiDWX-laGI1iPY5-tEp_FWtbzLHa17Yg.JPEG.guseo109/20180820_191348.jpg?type=f238", 
+    link: "https://blog.naver.com/PostView.naver?blogId=guseo109&logNo=221342958227&categoryNo=8&parentCategoryNo=&from=thumbnailList" 
+  },
+  { 
+    title: "울산 남구 무거동 현대 아파트", 
+    tags: ["#무거동현대아파트", "#아파트리모델링"], 
+    img: "https://postfiles.pstatic.net/MjAxODA4MTZfNDQg/MDAxNTM0NDEzMDYyMjAw.APeT2MzRJ96RFWyBEa8KvTo4ENF7vka_GeP8Hl4RQdwg.ugoTzqOMCEgwxMw62F0_a3P96-5_nFmuSEpxoh0qNhUg.JPEG.guseo109/20180816_134456.jpg?type=f238", 
+    link: "https://blog.naver.com/PostView.naver?blogId=guseo109&logNo=221340115865&categoryNo=8&parentCategoryNo=&from=thumbnailList" 
+  },
+  { 
+    title: "경주 산내 컨테이너집", 
+    tags: ["#컨테이너집", "#경주인테리어"], 
+    img: "https://postfiles.pstatic.net/MjAxODA4MDdfMTAz/MDAxNTMzNjQxNjgwMjc5.fNLxbLC6lSFUY2e8YwUJ3CYOfMz-3u98r6Yrvv52Je0g.Elbl-wErhKVVgBWzLZWYzeaMurHrHDh5v5B7K00x794g.JPEG.guseo109/20180807_105900.jpg?type=f238", 
+    link: "https://blog.naver.com/PostView.naver?blogId=guseo109&logNo=221334462137&categoryNo=8&parentCategoryNo=&from=thumbnailList" 
+  },
+  { 
+    title: "울산 동구 서부 아파트 24평", 
+    tags: ["#서부아파트", "#24평인테리어"], 
+    img: "https://postfiles.pstatic.net/MjAxODA4MDZfMTYw/MDAxNTMzNTU3OTI2MTU0.IckJnZgxlJFxcmVWi-IZyNNI35q7QPgfKgQ4VQx1ulQg.zoTVZ-XOo3IkrshRLzmqeR8niCyH6kh_K6fsXYWzG1Ag.JPEG.guseo109/20180803_102652.jpg?type=f238", 
+    link: "https://blog.naver.com/PostView.naver?blogId=guseo109&logNo=221333792753&categoryNo=8&parentCategoryNo=&from=thumbnailList" 
+  },
+  { 
+    title: "무거동 롯데캐슬", 
+    tags: ["#무거동롯데캐슬", "#아파트인테리어"], 
+    img: "https://postfiles.pstatic.net/MjAxODA4MDRfMTY0/MDAxNTMzMzUzMTA2NjM3.2mIbaA_8JTTGOoxrx4ijwFPohF77mmpI7SKxDyQPG-cg.QNQ9KfEjaAOe2yoEzlKqEys6BHJxQn0y83oRCWufNSAg.JPEG.guseo109/20180727_203645.jpg?type=f238", 
+    link: "https://blog.naver.com/PostView.naver?blogId=guseo109&logNo=221332457757&categoryNo=8&parentCategoryNo=&from=thumbnailList" 
+  },
+  { 
+    title: "화장실 방수, 시다지 작업", 
+    tags: ["#화장실방수", "#시다지작업"], 
+    img: "https://postfiles.pstatic.net/MjAxODA4MDFfMjQx/MDAxNTMzMTE1OTA5Njk5.Odde4z00RQ94oSgikzpVNO7S7va85FAjoPwGmtaeZUAg.wuoaitIUtJg9c5EtciRLJosqFVOyZ8tClUO_ShNiEpEg.JPEG.guseo109/20180730_154333.jpg?type=f238", 
+    link: "https://blog.naver.com/PostView.naver?blogId=guseo109&logNo=221330869227&categoryNo=8&parentCategoryNo=&from=thumbnailList" 
+  },
+  { 
+    title: "경주 산내 목작업 3일차", 
+    tags: ["#목작업", "#경주인테리어"], 
+    img: "https://postfiles.pstatic.net/MjAxODA3MjdfMTcx/MDAxNTMyNjcwODI0NTI0.pd7mct0PRW6FlBuarDD8VaG_r5_EKtfeI0fRfRvrz98g.NQN6JSAhchnfMIxfhSRE-FfAhgMg9FUBBepTJL8htLQg.JPEG.guseo109/20180727_141044.jpg?type=f238", 
+    link: "https://blog.naver.com/PostView.naver?blogId=guseo109&logNo=221327755337&categoryNo=8&parentCategoryNo=&from=thumbnailList" 
+  },
+  { 
+    title: "컨테이너 인테리어", 
+    tags: ["#컨테이너인테리어", "#특수공간"], 
+    img: "https://postfiles.pstatic.net/MjAxODA3MjVfMjky/MDAxNTMyNTA1MDI5Mjkx.5h1a8glVUVlrUDJN-BYeX6jlOoG8oZF_KkiLSBihEiYg.MFM9CKbopBdipko0YbQmgHy2pFweGOQvrDQrxzKco9Ig.JPEG.guseo109/20180725_154956.jpg?type=f238", 
+    link: "https://blog.naver.com/PostView.naver?blogId=guseo109&logNo=221326343774&categoryNo=8&parentCategoryNo=&from=thumbnailList" 
+  },
+  { 
+    title: "블라인더, 커튼 작업", 
+    tags: ["#블라인드설치", "#커튼작업"], 
+    img: "https://postfiles.pstatic.net/MjAxODA3MjJfOTIg/MDAxNTMyMjQ0NzY1NzQx.XTLbfGHp7CS3knvT2gliEyvK6AaVAEOPavsO_FH-Ij8g.IaaCrOO_Ha4B1fdK1djfBxlmj13BzxlZtWc8RuDLDwQg.JPEG.guseo109/20180406_182408.jpg?type=f238", 
+    link: "https://blog.naver.com/PostView.naver?blogId=guseo109&logNo=221324107131&categoryNo=8&parentCategoryNo=&from=thumbnailList" 
+  },
+  { 
+    title: "싱크대 연마", 
+    tags: ["#싱크대연마", "#주방인테리어"], 
+    img: "https://postfiles.pstatic.net/MjAxODA3MjBfMjMx/MDAxNTMyMDQ5MzMzMDU4.0hcyyobOvG83zufNlKnKYSuRY3iWyF_HrNT_whlIwWAg.uipGXQMM-QT5VV-Q4YyhmKtdTlaehz9yFwr06CtZ_40g.JPEG.guseo109/20180320_174431.jpg?type=f238", 
+    link: "https://blog.naver.com/PostView.naver?blogId=guseo109&logNo=221322700430&categoryNo=8&parentCategoryNo=&from=thumbnailList" 
+  }
+];
+
+const allDataRaw = [
+  ...page1DataRaw,
+  ...page2DataRaw,
+  ...page3DataRaw,
+  ...page4DataRaw,
+  ...page5DataRaw,
+  ...page6DataRaw,
+  ...page7DataRaw,
+  ...page8DataRaw,
+  ...page9DataRaw,
+  ...page10DataRaw,
+  ...page11DataRaw
+];
+
+const portfolioDataWithIds = allDataRaw.map((item, index) => ({
+  ...item,
+  id: index + 1
+}));
+
+const totalTargetItems = 11 * 16;
+const currentDataLength = portfolioDataWithIds.length;
+
+const dummyData = Array.from({ length: Math.max(0, totalTargetItems - currentDataLength) }, (_, index) => ({
+  title: `이솝디자인의 추가 시공 포트폴리오 준비중입니다.`,
+  link: "https://blog.naver.com/guseo109",
+  img: `https://via.placeholder.com/400x250?text=Aesop+Design+Archive`,
+  tags: ["#울산인테리어", "#포트폴리오"],
+  id: currentDataLength + index + 1
+}));
+
+// 페이지 데이터를 통합하여 전체 포트폴리오 배열 생성
+const portfolioData = [...portfolioDataWithIds, ...dummyData];
+
+const totalItems = portfolioData.length;
+const itemsPerPage = 16;
+const totalPages = 11;
+
+export default function Portfolio() {
+  const [currentPage, setCurrentPage] = useState(1);
+  const sectionRef = useRef<HTMLElement>(null);
+
+  const start = (currentPage - 1) * itemsPerPage;
+  const end = start + itemsPerPage;
+  const currentItems = portfolioData.slice(start, end);
+
+  const changePage = (page: number) => {
+    setCurrentPage(page);
+    if (sectionRef.current) {
+      const yOffset = -80; // Account for fixed header
+      const y = sectionRef.current.getBoundingClientRect().top + window.scrollY + yOffset;
+      window.scrollTo({ top: y, behavior: 'smooth' });
+    }
+  };
+
+  // Generate pagination buttons
+  const renderPagination = () => {
+    const buttons = [];
+    
+    // Prev button
+    buttons.push(
+      <button 
+        key="prev"
+        className="bg-transparent border-none text-[1.2rem] text-text-sub cursor-pointer px-2.5 hover:text-text-main"
+        onClick={() => currentPage > 1 && changePage(currentPage - 1)}
+      >
+        ⟨
+      </button>
+    );
+
+    // Dynamic window logic
+    let startPage = Math.max(1, currentPage - 3);
+    let endPage = Math.min(totalPages, startPage + 6);
+    
+    if (endPage - startPage < 6) {
+      startPage = Math.max(1, endPage - 6);
+    }
+
+    if (startPage > 1) {
+      buttons.push(
+        <span key="ellipsis-start" className="text-text-sub px-2 flex items-end pb-2">
+          ...
+        </span>
+      );
+    }
+
+    // Number buttons
+    for (let i = startPage; i <= endPage; i++) {
+      buttons.push(
+        <button
+          key={i}
+          className={cn(
+            "w-10 h-10 rounded-full border border-border-color bg-white text-text-main text-base font-semibold cursor-pointer flex justify-center items-center transition-all duration-200",
+            i === currentPage 
+              ? "bg-brand-color text-white border-brand-color" 
+              : "hover:bg-[#f5f5f5]"
+          )}
+          onClick={() => changePage(i)}
+        >
+          {i}
+        </button>
+      );
+    }
+
+    if (endPage < totalPages) {
+      buttons.push(
+        <span key="ellipsis-end" className="text-text-sub px-2 flex items-end pb-2">
+          ...
+        </span>
+      );
+    }
+
+    // Next button
+    buttons.push(
+      <button 
+        key="next"
+        className="bg-transparent border-none text-[1.2rem] text-text-sub cursor-pointer px-2.5 hover:text-text-main"
+        onClick={() => currentPage < totalPages && changePage(currentPage + 1)}
+      >
+        ⟩
+      </button>
+    );
+
+    // Last button
+    buttons.push(
+      <button 
+        key="last"
+        className="bg-transparent border-none text-[1.2rem] text-text-sub cursor-pointer px-2.5 hover:text-text-main"
+        onClick={() => changePage(totalPages)}
+      >
+        »
+      </button>
+    );
+
+    return buttons;
+  };
+
+  return (
+    <section ref={sectionRef} className="py-[100px] px-5 bg-primary-bg">
+      <div className="max-w-[1400px] mx-auto">
+        <h2 className="font-montserrat text-[2.5rem] font-extrabold text-center mb-5 tracking-tight">
+          PORTFOLIO ARCHIVE
+        </h2>
+        <div className="text-center text-text-sub mb-[50px] text-[1.1rem]">
+          다양한 평형과 예산에 맞춘 이솝디자인의 시공 사례를 확인하세요.
+        </div>
+        
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-3 sm:gap-6 min-h-[800px] content-start">
+          {currentItems.map(item => (
+            <a 
+              key={item.id}
+              href={item.link}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="bg-white border border-[#eaeaea] rounded-lg overflow-hidden transition-all duration-300 hover:-translate-y-[5px] hover:shadow-[0_10px_20px_rgba(0,0,0,0.08)] flex flex-col h-full cursor-pointer text-inherit no-underline"
+            >
+              <div className="relative w-full pt-[75%] bg-[#f8f9fa] overflow-hidden">
+                <img 
+                  src={item.img} 
+                  alt={item.title}
+                  className="absolute top-0 left-0 w-full h-full object-cover"
+                  loading="lazy"
+                  referrerPolicy="no-referrer"
+                />
+                {('isVideo' in item && item.isVideo) && (
+                  <div className="absolute inset-0 flex items-center justify-center bg-black/30">
+                    <svg className="w-8 h-8 sm:w-12 sm:h-12 text-white opacity-80" fill="currentColor" viewBox="0 0 20 20">
+                      <path d="M4 4l12 6-12 6z" />
+                    </svg>
+                  </div>
+                )}
+              </div>
+              <div className="p-3 sm:p-4 flex flex-col grow">
+                <h3 className="text-[0.85rem] sm:text-base font-semibold text-[#111] mb-1.5 sm:mb-2 leading-[1.4] line-clamp-2 break-keep">
+                  {item.title}
+                </h3>
+                {('date' in item && item.date) && (
+                  <div className="text-[0.65rem] sm:text-xs text-gray-500 mb-1.5 sm:mb-2">
+                    {item.date}
+                  </div>
+                )}
+                <p className="text-[0.7rem] sm:text-[0.85rem] text-[#0066ff] m-0 mt-auto">
+                  {item.tags ? item.tags.join(' ') : ''}
+                </p>
+              </div>
+            </a>
+          ))}
+        </div>
+
+        <div className="flex justify-center items-center gap-2 mt-[60px] font-montserrat flex-wrap">
+          {renderPagination()}
+        </div>
+      </div>
+    </section>
+  );
+}
