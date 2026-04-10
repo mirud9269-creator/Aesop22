@@ -28,12 +28,12 @@ export default function App() {
           📝 1분 간편 견적 알아보기
         </button>
         <a 
-          href="https://blog.naver.com/guseo109/224164446526"
+          href="https://www.instagram.com/aesop_interior_design2?igsh=MXYwNDg2czdzM2N0YQ=="
           target="_blank"
           rel="noopener noreferrer"
-          className="bg-transparent backdrop-blur-md text-[#222] border border-[#222] px-3 sm:px-10 py-3 sm:py-[15px] rounded-[30px] text-[0.75rem] sm:text-[1.1rem] font-bold shadow-[0_10px_20px_rgba(0,0,0,0.1)] hover:bg-gray-100 hover:text-black hover:border-black active:scale-95 transition-all duration-300 cursor-pointer flex items-center justify-center gap-1 sm:gap-2 flex-1 sm:flex-none no-underline whitespace-nowrap"
+          className="bg-gradient-to-tr from-[#f09433] via-[#dc2743] to-[#bc1888] backdrop-blur-md text-white border border-transparent px-3 sm:px-10 py-3 sm:py-[15px] rounded-[30px] text-[0.75rem] sm:text-[1.1rem] font-bold shadow-[0_10px_20px_rgba(0,0,0,0.1)] hover:opacity-90 hover:text-white active:scale-95 transition-all duration-300 cursor-pointer flex items-center justify-center gap-1 sm:gap-2 flex-1 sm:flex-none no-underline whitespace-nowrap"
         >
-          어떤식으로 설계하나요?
+          이솝 인테리어 인스타그램
         </a>
       </div>
 
