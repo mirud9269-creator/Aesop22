@@ -30,16 +30,6 @@ export default function LectureSection() {
             <div className="flex-[1.2] grid grid-cols-1 gap-[30px] text-left">
               {/* spec-col */}
               <div>
-                <h4 className="font-montserrat text-[1.2rem] mb-[20px] pb-[10px] border-b border-[#333] text-gray-400 font-bold">PAST</h4>
-                <ul className="list-none space-y-[12px]">
-                  <li className="text-[0.95rem] text-gray-300 relative pl-[15px] before:content-['■'] before:absolute before:left-0 before:text-[#d4af37] before:text-[0.6rem] before:top-[6px]">조선소 경력 15년 근무</li>
-                  <li className="text-[0.95rem] text-gray-300 relative pl-[15px] before:content-['■'] before:absolute before:left-0 before:text-[#d4af37] before:text-[0.6rem] before:top-[6px]">해양사업부 구조과 경인산업 소장</li>
-                  <li className="text-[0.95rem] text-gray-300 relative pl-[15px] before:content-['■'] before:absolute before:left-0 before:text-[#d4af37] before:text-[0.6rem] before:top-[6px]">JN인테리어 대표</li>
-                  <li className="text-[0.95rem] text-gray-300 relative pl-[15px] before:content-['■'] before:absolute before:left-0 before:text-[#d4af37] before:text-[0.6rem] before:top-[6px]">인테리어 학원 대표 원장</li>
-                </ul>
-              </div>
-              {/* spec-col */}
-              <div>
                 <h4 className="font-montserrat text-[1.2rem] mb-[20px] pb-[10px] border-b border-[#333] text-gray-400 font-bold">PRESENT</h4>
                 <ul className="list-none space-y-[12px]">
                   <li className="text-[0.95rem] text-gray-300 relative pl-[15px] before:content-['■'] before:absolute before:left-0 before:text-[#d4af37] before:text-[0.6rem] before:top-[6px]">이솝 인테리어 디자인</li>
