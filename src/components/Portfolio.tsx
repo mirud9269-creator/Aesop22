@@ -989,7 +989,7 @@ export default function Portfolio() {
   };
 
   return (
-    <section ref={sectionRef} className="py-[100px] px-5 bg-primary-bg">
+    <section ref={sectionRef} className="py-[100px] px-2 sm:px-5 bg-primary-bg">
       <div className="max-w-[1400px] mx-auto">
         <h2 className="font-montserrat text-[2.5rem] font-extrabold text-center mb-5 tracking-tight">
           PORTFOLIO ARCHIVE
@@ -998,7 +998,7 @@ export default function Portfolio() {
           다양한 평형과 예산에 맞춘 이솝디자인의 시공 사례를 확인하세요.
         </div>
         
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-3 sm:gap-6 min-h-[800px] content-start">
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-2 sm:gap-6 min-h-[800px] content-start">
           {currentItems.map(item => (
             <a 
               key={item.id}

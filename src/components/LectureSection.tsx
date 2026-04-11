@@ -42,11 +42,11 @@ export default function LectureSection() {
               <div>
                 <h4 className="font-montserrat text-[1.2rem] mb-[20px] pb-[10px] border-b border-[#333] text-gray-400 font-bold">PRESENT</h4>
                 <ul className="list-none space-y-[12px]">
-                  <li className="text-[0.95rem] text-gray-300 relative pl-[15px] before:content-['■'] before:absolute before:left-0 before:text-[#d4af37] before:text-[0.6rem] before:top-[6px]">이솝인테리어 디자인 대표</li>
-                  <li className="text-[0.95rem] text-gray-300 relative pl-[15px] before:content-['■'] before:absolute before:left-0 before:text-[#d4af37] before:text-[0.6rem] before:top-[6px]">더오름 주식회사 대표</li>
-                  <li className="text-[0.95rem] text-gray-300 relative pl-[15px] before:content-['■'] before:absolute before:left-0 before:text-[#d4af37] before:text-[0.6rem] before:top-[6px]">이솝 스터디 카페 프랜차이즈 대표</li>
+                  <li className="text-[0.95rem] text-gray-300 relative pl-[15px] before:content-['■'] before:absolute before:left-0 before:text-[#d4af37] before:text-[0.6rem] before:top-[6px]">이솝 인테리어 디자인</li>
+                  <li className="text-[0.95rem] text-gray-300 relative pl-[15px] before:content-['■'] before:absolute before:left-0 before:text-[#d4af37] before:text-[0.6rem] before:top-[6px]">더오름 주식회사</li>
+                  <li className="text-[0.95rem] text-gray-300 relative pl-[15px] before:content-['■'] before:absolute before:left-0 before:text-[#d4af37] before:text-[0.6rem] before:top-[6px]">이솝 스터디</li>
+                  <li className="text-[0.95rem] text-gray-300 relative pl-[15px] before:content-['■'] before:absolute before:left-0 before:text-[#d4af37] before:text-[0.6rem] before:top-[6px]">카페 프랜차이즈</li>
                   <li className="text-[0.95rem] text-gray-300 relative pl-[15px] before:content-['■'] before:absolute before:left-0 before:text-[#d4af37] before:text-[0.6rem] before:top-[6px]">전문 투자자</li>
-                  <li className="text-[0.95rem] text-gray-300 relative pl-[15px] before:content-['■'] before:absolute before:left-0 before:text-[#d4af37] before:text-[0.6rem] before:top-[6px]"><span className="text-[#ff6b6b] font-bold">주택임대사업자 (적폐)</span></li>
                 </ul>
               </div>
             </div>
